@@ -8,6 +8,7 @@ export default function Home() {
   const [selectedCat, setSelectedCat] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [syncSource, setSyncSource] = useState('local_fallback');
+  const [activeNewsItem, setActiveNewsItem] = useState(null);
   const [trends, setTrends] = useState([
     { name: 'One Piece (Arc Elbaph)', value: 0, target: 94 },
     { name: 'Star Wars (The Mandalorian)', value: 0, target: 87 },
@@ -186,7 +187,7 @@ export default function Home() {
           <div className="mosaic-grid">
             {/* Grand article principal à la Une */}
             {mosaicMain && (
-              <div className="mosaic-main">
+              <div className="mosaic-main" onClick={() => setActiveNewsItem(mosaicMain)}>
                 <div 
                   className="mosaic-bg-image" 
                   style={{ backgroundImage: `url(${CATEGORY_IMAGES[mosaicMain.cat] || CATEGORY_IMAGES.cine})` }}
@@ -210,7 +211,7 @@ export default function Home() {
             {/* Articles secondaires empilés à droite (3 articles max) */}
             <div className="hero-side-stack">
               {mosaicSide.map((item, idx) => (
-                <div key={idx} className="mosaic-side-card">
+                <div key={idx} className="mosaic-side-card" onClick={() => setActiveNewsItem(item)}>
                   <div 
                     className="side-card-bg-image" 
                     style={{ backgroundImage: `url(${CATEGORY_IMAGES[item.cat] || CATEGORY_IMAGES.cine})` }}
@@ -224,6 +225,7 @@ export default function Home() {
                       {isFresh(item.published_at) && <span className="fresh-badge" style={{ fontSize: '0.65rem', padding: '2px 6px' }}>⚡</span>}
                     </div>
                     <h3 className="side-card-title">{item.title}</h3>
+                    <p className="side-card-text" style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.75)', display: '-webkit-box', WebkitLineClamp: '2', WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: '1.45', marginTop: '2px' }}>{item.text}</p>
                     <span className="mosaic-date" style={{ fontSize: '0.7rem' }}>{getDisplayTime(item)}</span>
                   </div>
                 </div>
@@ -278,7 +280,7 @@ export default function Home() {
               </div>
             ) : (
               feedNews.map((item, idx) => (
-                <div key={idx} className="news-card-item">
+                <div key={idx} className="news-card-item" onClick={() => setActiveNewsItem(item)}>
                   <div className="news-card-media">
                     <div 
                       className="news-card-media-img"
@@ -371,6 +373,70 @@ export default function Home() {
           Tous droits réservés. Les marques et logos mentionnés restent la propriété de leurs titulaires respectifs.
         </p>
       </footer>
+
+      {/* Interactive Premium News Modal */}
+      {activeNewsItem && (
+        <div className="news-modal-overlay" onClick={() => setActiveNewsItem(null)}>
+          <div className="news-modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="close-modal-btn" onClick={() => setActiveNewsItem(null)}>
+              &times;
+            </button>
+            <div className="modal-header-section">
+              <span className={`category-tag cat-${activeNewsItem.cat}`}>
+                {activeNewsItem.emoji} {CATEGORIES[activeNewsItem.cat]?.label}
+              </span>
+              <span className="modal-date">{getDisplayTime(activeNewsItem)}</span>
+            </div>
+            <h2 className="modal-title">{activeNewsItem.title}</h2>
+            
+            {/* Visual background placeholder banner in modal */}
+            <div 
+              className="modal-banner" 
+              style={{ backgroundImage: `url(${CATEGORY_IMAGES[activeNewsItem.cat] || CATEGORY_IMAGES.cine})` }}
+            >
+              <div className="modal-banner-overlay" />
+              <span className="modal-banner-emoji">{activeNewsItem.emoji}</span>
+            </div>
+
+            <div className="modal-body">
+              <h4 className="modal-section-title">Actualité Pop Culture & Licences</h4>
+              <p className="modal-text">{activeNewsItem.text}</p>
+              
+              {/* R6G Licensing & Retail Intelligence Section */}
+              <div className="r6g-analysis-box">
+                <div className="analysis-header">
+                  <span className="analysis-logo">🛡️</span>
+                  <div>
+                    <h4 className="analysis-title">R6G Licensing Intelligence</h4>
+                    <p className="analysis-subtitle">Analyse d'impact retail & tendances B2B</p>
+                  </div>
+                </div>
+                <div className="analysis-grid">
+                  <div className="analysis-metric">
+                    <span className="metric-label">Indice de Hype</span>
+                    <span className="metric-value text-yellow">
+                      {activeNewsItem.hot ? '95%' : '84%'}
+                    </span>
+                  </div>
+                  <div className="analysis-metric">
+                    <span className="metric-label">Potentiel Commercial</span>
+                    <span className="metric-value text-green">Très Élevé</span>
+                  </div>
+                  <div className="analysis-metric">
+                    <span className="metric-label">Cible Consommateurs</span>
+                    <span className="metric-value">
+                      {activeNewsItem.cat === 'collab' ? 'Millennials / Collect' : activeNewsItem.cat === 'manga' ? 'Génération Z' : 'Fanbase Grand Public'}
+                    </span>
+                  </div>
+                </div>
+                <div className="analysis-commentary">
+                  <strong>Décryptage de l'Expert R6G :</strong> Cette annonce confirme la vigueur insolente du segment de licence auprès des consommateurs européens. Le sell-out constaté en hypermarchés (notamment dans les corners Carrefour et Cora) démontre que les lancements de produits dérivés d'anime et de collabs de marque captent l'attention immédiate. Nous conseillons aux chefs de rayon d'accentuer la théâtralisation en magasin pour maximiser le chiffre d'affaires impulsif.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
