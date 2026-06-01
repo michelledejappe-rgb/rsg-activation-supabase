@@ -157,6 +157,7 @@ export default function Home() {
         <title>Road Sixty Geek (QG) — Portail Pop Culture & Licences B2B</title>
         <meta name="description" content="Toute l'actualité business, analyses de tendances et merchandising des plus grandes licences manga, anime, ciné, séries et collabs de marque." />
         <link rel="icon" href="/favicon.ico" />
+        <link rel="canonical" href="https://roadsixtygeek.com" />
         <meta property="og:title" content="Road Sixty Geek (QG) — Portail Pop Culture & Licences B2B" />
         <meta property="og:description" content="L'actualité business et tendances de la pop culture et du merchandising à destination des professionnels et des fans." />
         <meta property="og:type" content="website" />
