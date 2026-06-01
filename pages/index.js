@@ -9,6 +9,14 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [syncSource, setSyncSource] = useState('local_fallback');
   const [activeNewsItem, setActiveNewsItem] = useState(null);
+  
+  // Nouveaux états interactifs du plan d'amélioration
+  const [votes, setVotes] = useState({});
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterStatus, setNewsletterStatus] = useState('');
+  const [feedbackText, setFeedbackText] = useState('');
+  const [feedbackStatus, setFeedbackStatus] = useState('');
+
   const [trends, setTrends] = useState([
     { name: 'One Piece (Arc Elbaph)', value: 0, target: 94 },
     { name: 'Star Wars (The Mandalorian)', value: 0, target: 87 },
@@ -65,7 +73,6 @@ export default function Home() {
   });
 
   // Séparer les actualités pour la Mosaïque "À la Une" (Hero Grid)
-  // mosaicMain : le premier élément "hot", ou par défaut le premier tout court
   let mosaicMain = null;
   let mosaicSide = [];
   let feedNews = [];
@@ -112,7 +119,7 @@ export default function Home() {
     return item.date_str || pubDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
   }
 
-  // Obtenir des visuels en arrière-plan cohérents pour la Pop Culture (fallback si pas d'image)
+  // Obtenir des visuels en arrière-plan cohérents pour la Pop Culture (fallback si pas d'image spécifique)
   const CATEGORY_IMAGES = {
     cine: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=600&auto=format&fit=crop',
     series: 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?q=80&w=600&auto=format&fit=crop',
@@ -121,12 +128,90 @@ export default function Home() {
     collab: 'https://images.unsplash.com/photo-1559251606-c623743a6d76?q=80&w=600&auto=format&fit=crop'
   };
 
+  // Calculer l'indice de Hype dynamique selon le vote de l'utilisateur
+  function getDynamicMetrics(item) {
+    const vote = votes[item.title];
+    if (vote === 'hype') {
+      return {
+        hype: '98% (Massif)',
+        potential: 'Critique (Ruée)',
+        target: item.cat === 'collab' ? 'Adultes / Collectionneurs' : 'Fanbase Optimisée'
+      };
+    } else if (vote === 'flop') {
+      return {
+        hype: '42% (Faible)',
+        potential: 'Risqué (Sur-stock)',
+        target: 'Surchargé / Niche'
+      };
+    }
+    return {
+      hype: item.hot ? '95%' : '84%',
+      potential: 'Très Élevé',
+      target: item.cat === 'collab' ? 'Millennials / Collect' : item.cat === 'manga' ? 'Génération Z' : 'Fanbase Grand Public'
+    };
+  }
+
   return (
     <div className="min-h-screen bg-black text-white relative">
       <Head>
-        <title>Road Sixty Geek (QG) — Portail Pop Culture & Licences</title>
-        <meta name="description" content="Toute l'actualité business et tendances des plus grandes licences manga, anime, ciné, séries et collabs de marque." />
+        <title>Road Sixty Geek (QG) — Portail Pop Culture & Licences B2B</title>
+        <meta name="description" content="Toute l'actualité business, analyses de tendances et merchandising des plus grandes licences manga, anime, ciné, séries et collabs de marque." />
         <link rel="icon" href="/favicon.ico" />
+        <meta property="og:title" content="Road Sixty Geek (QG) — Portail Pop Culture & Licences B2B" />
+        <meta property="og:description" content="L'actualité business et tendances de la pop culture et du merchandising à destination des professionnels et des fans." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://roadsixtygeek.com" />
+        <meta property="og:image" content="https://roadsixtygeek.com/logo.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Road Sixty Geek (QG) — Portail Pop Culture & Licences B2B" />
+        <meta name="twitter:description" content="L'actualité business et tendances de la pop culture et du merchandising." />
+        <meta name="twitter:image" content="https://roadsixtygeek.com/logo.png" />
+        
+        {/* Données Structurées JSON-LD pour l'Organisation */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "NewsMediaOrganization",
+              "name": "Road Sixty Geek QG",
+              "url": "https://roadsixtygeek.com",
+              "logo": "https://roadsixtygeek.com/logo.png",
+              "sameAs": [
+                "https://www.linkedin.com/company/roadsixtygeek"
+              ]
+            })
+          }}
+        />
+        
+        {/* Données Structurées JSON-LD dynamiques par article */}
+        {activeNewsItem && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "NewsArticle",
+                "headline": activeNewsItem.title,
+                "description": activeNewsItem.text,
+                "datePublished": activeNewsItem.published_at || new Date().toISOString(),
+                "image": activeNewsItem.img || "https://roadsixtygeek.com/logo.png",
+                "author": {
+                  "@type": "Organization",
+                  "name": "Road Sixty Geek Intelligence"
+                },
+                "publisher": {
+                  "@type": "Organization",
+                  "name": "Road Sixty Geek QG",
+                  "logo": {
+                    "@type": "ImageObject",
+                    "url": "https://roadsixtygeek.com/logo.png"
+                  }
+                }
+              })
+            }}
+          />
+        )}
       </Head>
 
       {/* Lueurs d'ambiance en arrière-plan */}
@@ -190,7 +275,7 @@ export default function Home() {
               <div className="mosaic-main" onClick={() => setActiveNewsItem(mosaicMain)}>
                 <div 
                   className="mosaic-bg-image" 
-                  style={{ backgroundImage: `url(${CATEGORY_IMAGES[mosaicMain.cat] || CATEGORY_IMAGES.cine})` }}
+                  style={{ backgroundImage: `url(${mosaicMain.img || CATEGORY_IMAGES[mosaicMain.cat]})` }}
                 />
                 <div className="mosaic-overlay" />
                 <div className="mosaic-content">
@@ -214,7 +299,7 @@ export default function Home() {
                 <div key={idx} className="mosaic-side-card" onClick={() => setActiveNewsItem(item)}>
                   <div 
                     className="side-card-bg-image" 
-                    style={{ backgroundImage: `url(${CATEGORY_IMAGES[item.cat] || CATEGORY_IMAGES.cine})` }}
+                    style={{ backgroundImage: `url(${item.img || CATEGORY_IMAGES[item.cat]})` }}
                   />
                   <div className="side-card-overlay" />
                   <div className="side-card-content">
@@ -284,7 +369,7 @@ export default function Home() {
                   <div className="news-card-media">
                     <div 
                       className="news-card-media-img"
-                      style={{ backgroundImage: `url(${CATEGORY_IMAGES[item.cat] || CATEGORY_IMAGES.cine})`, opacity: 0.15 }}
+                      style={{ backgroundImage: `url(${item.img || CATEGORY_IMAGES[item.cat]})`, opacity: 0.15 }}
                     />
                     <span className="news-card-emoji">{item.emoji}</span>
                   </div>
@@ -334,22 +419,58 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Widget d'appel à l'action pour le quiz/jeu RSG original */}
-          <div className="sidebar-widget game-ad-widget">
-            <div className="game-ad-content">
-              <span className="game-ad-badge">🔥 Challenge</span>
-              <h3 className="game-ad-title">Testez vos connaissances Geek !</h3>
-              <p className="game-ad-text">
-                Rejoignez l'activation Road Sixty Geek. Répondez au questionnaire de rapidité de 8 secondes, enregistrez votre meilleur score et décrochez une place au classement !
-              </p>
-              <button 
-                className="play-quiz-btn" 
-                style={{ width: '100%', justifyContent: 'center', marginTop: '0.5rem' }}
-                onClick={() => window.location.href = 'https://roadsixtygeek.com/activation'}
-              >
-                ⚡ Relever le Défi
-              </button>
-            </div>
+          {/* Widget Newsletter Premium (Plan d'Amélioration Axe 3) */}
+          <div className="sidebar-widget">
+            <h3 className="widget-title">Newsletter Veille Hebdo</h3>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.2rem', lineHeight: '1.4' }}>
+              Rejoignez plus de 1 200 acheteurs et recevez notre condensé de tendances licences tous les lundis.
+            </p>
+            {newsletterStatus === 'success' ? (
+              <div style={{ background: 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)', padding: '12px', borderRadius: '8px', fontSize: '0.8rem', color: 'var(--color-green)', fontWeight: '600' }}>
+                ✨ Inscription validée ! Bienvenue dans la veille.
+              </div>
+            ) : (
+              <form onSubmit={(e) => { e.preventDefault(); if (newsletterEmail) setNewsletterStatus('success'); }} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <input
+                  type="email"
+                  placeholder="Votre email professionnel..."
+                  required
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  style={{ background: 'var(--bg-glass)', border: '1px solid var(--border-white)', padding: '10px', borderRadius: '8px', fontSize: '0.8rem', color: 'var(--text-primary)', outline: 'none' }}
+                />
+                <button type="submit" className="play-quiz-btn" style={{ justifyContent: 'center', fontSize: '0.8rem', padding: '10px' }}>
+                  S'abonner à la veille B2B
+                </button>
+              </form>
+            )}
+          </div>
+
+          {/* Widget de Feedback / Axes d'amélioration (Plan d'Amélioration Protocole) */}
+          <div className="sidebar-widget">
+            <h3 className="widget-title">Avis & Axes d'Amélioration</h3>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.2rem', lineHeight: '1.4' }}>
+              Dites-nous ce qui vous plaît ou ce qui vous manque sur le QG !
+            </p>
+            {feedbackStatus === 'success' ? (
+              <div style={{ background: 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)', padding: '12px', borderRadius: '8px', fontSize: '0.8rem', color: 'var(--color-green)', fontWeight: '600' }}>
+                🙏 Merci ! Notre équipe analyse votre retour.
+              </div>
+            ) : (
+              <form onSubmit={(e) => { e.preventDefault(); if (feedbackText) setFeedbackStatus('success'); }} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <textarea
+                  placeholder="Fonctionnalités, données, ou actus manquantes..."
+                  required
+                  rows="3"
+                  value={feedbackText}
+                  onChange={(e) => setFeedbackText(e.target.value)}
+                  style={{ background: 'var(--bg-glass)', border: '1px solid var(--border-white)', padding: '10px', borderRadius: '8px', fontSize: '0.8rem', color: 'var(--text-primary)', outline: 'none', fontFamily: 'inherit', resize: 'vertical' }}
+                />
+                <button type="submit" className="play-quiz-btn" style={{ background: 'var(--color-dark)', color: 'var(--color-yellow)', justifyContent: 'center', fontSize: '0.8rem', padding: '10px' }}>
+                  Envoyer mon avis
+                </button>
+              </form>
+            )}
           </div>
 
           {/* Widget d'info de synchronisation (Preuve de cron) */}
@@ -392,7 +513,7 @@ export default function Home() {
             {/* Visual background placeholder banner in modal */}
             <div 
               className="modal-banner" 
-              style={{ backgroundImage: `url(${CATEGORY_IMAGES[activeNewsItem.cat] || CATEGORY_IMAGES.cine})` }}
+              style={{ backgroundImage: `url(${activeNewsItem.img || CATEGORY_IMAGES[activeNewsItem.cat]})` }}
             >
               <div className="modal-banner-overlay" />
               <span className="modal-banner-emoji">{activeNewsItem.emoji}</span>
@@ -402,6 +523,27 @@ export default function Home() {
               <h4 className="modal-section-title">Actualité Pop Culture & Licences</h4>
               <p className="modal-text">{activeNewsItem.text}</p>
               
+              {/* Vote interactif B2B (Plan d'Amélioration Axe 3) */}
+              <div style={{ background: 'var(--bg-glass)', border: '1px solid var(--border-white)', padding: '15px', borderRadius: '12px', marginTop: '8px' }}>
+                <h4 style={{ fontSize: '0.9rem', fontWeight: '800', fontFamily: 'var(--font-head)', color: 'var(--color-dark)', marginBottom: '4px' }}>Sentiment Décideur / Évaluation de Potentiel</h4>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '12px' }}>Votre avis pro sur le potentiel de cette licence dans vos points de vente.</p>
+                {votes[activeNewsItem.title] ? (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(234, 179, 8, 0.05)', border: '1px solid rgba(234, 179, 8, 0.2)', padding: '8px 12px', borderRadius: '8px', fontSize: '0.8rem', color: '#b28b03', fontWeight: '600' }}>
+                    <span>👍 Sentiment enregistré : {votes[activeNewsItem.title] === 'hype' ? 'Hype Massive' : 'Risque de Flop'} !</span>
+                    <button onClick={() => setVotes(prev => ({ ...prev, [activeNewsItem.title]: null }))} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', textDecoration: 'underline', fontSize: '0.75rem', cursor: 'pointer' }}>Modifier</button>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button onClick={() => setVotes(prev => ({ ...prev, [activeNewsItem.title]: 'hype' }))} style={{ flex: 1, border: '1px solid var(--border-white)', background: 'var(--bg-dark)', padding: '8px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', transition: 'var(--transition-smooth)' }}>
+                      🔥 Hype Massive
+                    </button>
+                    <button onClick={() => setVotes(prev => ({ ...prev, [activeNewsItem.title]: 'flop' }))} style={{ flex: 1, border: '1px solid var(--border-white)', background: 'var(--bg-dark)', padding: '8px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', transition: 'var(--transition-smooth)' }}>
+                      ⚠️ Risque Flop
+                    </button>
+                  </div>
+                )}
+              </div>
+
               {/* R6G Licensing & Retail Intelligence Section */}
               <div className="r6g-analysis-box">
                 <div className="analysis-header">
@@ -415,17 +557,19 @@ export default function Home() {
                   <div className="analysis-metric">
                     <span className="metric-label">Indice de Hype</span>
                     <span className="metric-value text-yellow">
-                      {activeNewsItem.hot ? '95%' : '84%'}
+                      {getDynamicMetrics(activeNewsItem).hype}
                     </span>
                   </div>
                   <div className="analysis-metric">
                     <span className="metric-label">Potentiel Commercial</span>
-                    <span className="metric-value text-green">Très Élevé</span>
+                    <span className="metric-value text-green">
+                      {getDynamicMetrics(activeNewsItem).potential}
+                    </span>
                   </div>
                   <div className="analysis-metric">
                     <span className="metric-label">Cible Consommateurs</span>
-                    <span className="metric-value">
-                      {activeNewsItem.cat === 'collab' ? 'Millennials / Collect' : activeNewsItem.cat === 'manga' ? 'Génération Z' : 'Fanbase Grand Public'}
+                    <span className="metric-value" style={{ fontSize: '0.8rem' }}>
+                      {getDynamicMetrics(activeNewsItem).target}
                     </span>
                   </div>
                 </div>

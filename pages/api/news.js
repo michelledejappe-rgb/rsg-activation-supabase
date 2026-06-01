@@ -10,7 +10,8 @@ const FALLBACK_NEWS = [
     date_str: "1er Juin 2026 · Retail",
     title: "LEGO lance Minas Tirith en avant-première Insiders ce 1er juin",
     text: "LEGO ouvre ce matin les ventes de son set Lord of the Rings 'Minas Tirith' (11 377 pièces) pour ses membres Insiders. Le set exclusif promotionnel 'Grond' offert suscite une ruée sans précédent chez les collectionneurs adultes. Ruptures de stocks attendues avant ce soir en ligne.",
-    hot: true
+    hot: true,
+    img: "https://images.unsplash.com/photo-1560942485-b2a11cc13456?q=80&w=600&auto=format&fit=crop"
   },
   {
     cat: "collab",
@@ -18,7 +19,8 @@ const FALLBACK_NEWS = [
     date_str: "1er Juin 2026 · Streetwear",
     title: "Uniqlo UT dévoile sa Vague 3 Shueisha (Bleach, SPY x FAMILY, Mashle)",
     text: "Le giant du retail Uniqlo vient d'annoncer officiellement le troisième drop de sa collection monumentale Shueisha 100th UT. Prévue pour août, cette vague intègre Bleach, Mashle, SPY×FAMILY et Yu-Gi-Oh!. Un booster de trafic majeur pour le textile jeune adulte.",
-    hot: true
+    hot: true,
+    img: "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=600&auto=format&fit=crop"
   },
   {
     cat: "anime",
@@ -26,7 +28,8 @@ const FALLBACK_NEWS = [
     date_str: "1er Juin 2026 · Fandom",
     title: "Demon Slayer : ufotable publie un visuel inédit de Mitsuri Kanroji",
     text: "Pour célébrer l'anniversaire du Pilier de l'Amour ce 1er juin, ufotable partage une illustration inédite. Le post suscite un engagement colossal, les fabricants de collectibles anticipent un pic de ventes sur les figurines de la licence ce mois-ci.",
-    hot: false
+    hot: false,
+    img: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=600&auto=format&fit=crop"
   },
   {
     cat: "series",
@@ -34,7 +37,8 @@ const FALLBACK_NEWS = [
     date_str: "1er Juin 2026 · Streaming",
     title: "Le film Milky☆Subway : The Galactic Limited Express rejoint Netflix",
     text: "Netflix surprend la fanbase de science-fiction rétro en ajoutant ce 1er juin le long-métrage Milky☆Subway. Une arrivée stratégique pour la plateforme qui continue de muscler ses droits exclusifs face à la concurrence de Crunchyroll.",
-    hot: false
+    hot: false,
+    img: "https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=600&auto=format&fit=crop"
   },
   {
     cat: "manga",
@@ -42,7 +46,8 @@ const FALLBACK_NEWS = [
     date_str: "31 Mai 2026 · Édition",
     title: "Clap de fin pour le manga 'La Belle et le Badass' de Sawako Arashida",
     text: "Le dernier chapitre est paru hier au Japon, bouclant cette comédie romantique plébiscitée. Le tome 6 final sortira le 15 juin. Les réseaux de librairies s'attendent à un trafic massif pour cette licence très vendeuse en rayon Shojo.",
-    hot: false
+    hot: false,
+    img: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=600&auto=format&fit=crop"
   },
   {
     cat: "series",
@@ -50,7 +55,8 @@ const FALLBACK_NEWS = [
     date_str: "30 Mai 2026 · Tokyo",
     title: "My Hero Academia bat Solo Leveling et rafle l'Anime of the Year 2026",
     text: "La conclusion de la saga MHA a été couronnée reine de l'année aux Crunchyroll Anime Awards à Tokyo suite à un vote record de 73 millions de fans. Une consécration commerciale ultime pour la franchise de Shueisha et ses licenciés.",
-    hot: true
+    hot: true,
+    img: "https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=600&auto=format&fit=crop"
   },
   {
     cat: "cine",
@@ -58,7 +64,8 @@ const FALLBACK_NEWS = [
     date_str: "30 Mai 2026 · Box-Office",
     title: "Demon Slayer : Infinity Castle sacré Film de l'Année 2026",
     text: "L'arc final en trilogie décroche le prix suprême. L'annonce booste la valorisation des droits de merchandising, les géants français du retail (FNAC, Micromania) préparent des corners physiques pour tout l'été.",
-    hot: false
+    hot: false,
+    img: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=600&auto=format&fit=crop"
   },
   {
     cat: "manga",
@@ -66,7 +73,8 @@ const FALLBACK_NEWS = [
     date_str: "31 Mai 2026 · Édition",
     title: "Le manga 'I Left My A-Rank Party' entre officiellement dans son arc final",
     text: "Kodansha confirme l'entrée dans la phase finale avec le chapitre 165. Un jalon important pour ce manga de fantasy qui cartonne en édition. Les distributeurs planifient déjà des réimpressions collectors de fin de parcours.",
-    hot: false
+    hot: false,
+    img: "https://images.unsplash.com/photo-1618519764620-7403abdbfee9?q=80&w=600&auto=format&fit=crop"
   },
   {
     cat: "collab",
@@ -74,7 +82,8 @@ const FALLBACK_NEWS = [
     date_str: "29 Mai 2026 · Horlogerie",
     title: "Casio dévoile une montre G-SHOCK exclusive inspirée de Gundam",
     text: "Un modèle premium collector aux couleurs du robot RX-78-2. Ce partenariat à fort impact lifestyle est déjà en rupture sur les précommandes. Une preuve de plus de la force du cross-licensing de luxe auprès des jeunes actifs.",
-    hot: false
+    hot: false,
+    img: "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?q=80&w=600&auto=format&fit=crop"
   },
   {
     cat: "collab",
@@ -82,7 +91,8 @@ const FALLBACK_NEWS = [
     date_str: "31 Mai 2026 · Collectibles",
     title: "Funko Winnie l'Ourson : une gamme 'Pop Nooks' pour le centenaire Disney",
     text: "Funko présente une série exclusive de décors miniatures Winnie l'Ourson pour célébrer le centenaire. Ce positionnement cadeau décoratif très porteur s'implante idéalement dans les rayons culturels pour la saison estivale.",
-    hot: false
+    hot: false,
+    img: "https://images.unsplash.com/photo-1559251606-c623743a6d76?q=80&w=600&auto=format&fit=crop"
   },
   {
     cat: "anime",
@@ -90,15 +100,17 @@ const FALLBACK_NEWS = [
     date_str: "1er Juin 2026 · Streaming",
     title: "Shangri-La Frontier Saison 2 démarre sur Crunchyroll et Netflix",
     text: "La saison 2 de l'anime phénomène sur le gaming en VR débute ce lundi 1er juin en simulcast mondial. Un événement streaming majeur qui dynamise déjà les ventes de figurines articulées Bandai Spirits dans les réseaux spécialisés et de grande distribution.",
-    hot: false
+    hot: false,
+    img: "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=600&auto=format&fit=crop"
   },
   {
     cat: "manga",
     emoji: "📖",
     date_str: "31 Mai 2026 · Édition",
     title: "Préparation Japan Expo : Les éditeurs français accélèrent les lancements",
-    text: "En vue du salon de juillet, Pika, Kana et Ki-oon dévoilent des plannings denses (Wind Breaker T22, Komi T25, Kaijin Fugeki T6). Les librairies spécialisées renforcent leurs stocks pour faire face à la ruée traditionnelle de l'été.",
-    hot: false
+    text: "En vue du salon de juillet, Pika, Kana et Ki-oon dévoillent des plannings denses (Wind Breaker T22, Komi T25, Kaijin Fugeki T6). Les librairies spécialisées renforcent leurs stocks pour faire face à la ruée traditionnelle de l'été.",
+    hot: false,
+    img: "https://images.unsplash.com/photo-1627856013091-fed6e4e30025?q=80&w=600&auto=format&fit=crop"
   },
   {
     cat: "manga",
@@ -106,7 +118,8 @@ const FALLBACK_NEWS = [
     date_str: "29 Mai 2026 · Ventes",
     title: "Frieren sacré manga le plus vendu du premier semestre 2026 en France",
     text: "L'œuvre de Kanehito Yamada franchit un cap historique en France. Ki-oon annonce un tirage supplémentaire massif pour approvisionner les hypermarchés afin d'éviter toute rupture de stock avant les vacances.",
-    hot: false
+    hot: false,
+    img: "https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=600&auto=format&fit=crop"
   },
   {
     cat: "cine",
@@ -114,7 +127,8 @@ const FALLBACK_NEWS = [
     date_str: "29 Mai 2026 · Grande Distrib",
     title: "Toy Story 5 : Carrefour et Cora installent des corners géants Pixar",
     text: "Disney déploie sa force de frappe commerciale pour le 5e opus Pixar. Les enseignes françaises installent des corners de vente géants théâtralisés pour capter la clientèle familiale tout au long du mois de juin.",
-    hot: false
+    hot: false,
+    img: "https://images.unsplash.com/photo-1558060370-d644479cb6f7?q=80&w=600&auto=format&fit=crop"
   },
   {
     cat: "series",
@@ -122,7 +136,8 @@ const FALLBACK_NEWS = [
     date_str: "28 Mai 2026 · Netflix",
     title: "Blue Lock : VS U-20 JAPAN est disponible en intégralité sur Netflix",
     text: "La série foot du moment arrive d'un coup en SVOD. L'effet de recommandation Netflix devrait faire exploser l'engagement et stimuler les drops textile ainsi que le sell-out sur les produits de licence sportive associés.",
-    hot: false
+    hot: false,
+    img: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=600&auto=format&fit=crop"
   },
   {
     cat: "collab",
@@ -130,7 +145,8 @@ const FALLBACK_NEWS = [
     date_str: "30 Mai 2026 · Streetwear",
     title: "adidas s'associe aux Bisounours pour un drop estival Kawaii",
     text: "La collection de sneakers et sportswear rétro Care Bears × adidas fait le buzz sur TikTok. Un drop centré sur la nostalgie Y2K qui s'annonce collector avec des ruptures immédiates sur l'application adidas Confirmed.",
-    hot: false
+    hot: false,
+    img: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?q=80&w=600&auto=format&fit=crop"
   },
   {
     cat: "series",
@@ -138,7 +154,8 @@ const FALLBACK_NEWS = [
     date_str: "27 Mai 2026 · Audiences",
     title: "My Dress-Up Darling S2 : Carton d'audience absolu pour la rom-com",
     text: "L'adaptation du manga de Shinichi Fukuda signe un démarrage exceptionnel sur Crunchyroll. Les fabricants de figurines de collection enregistrent des volumes de précommandes records sur le personnage de Marin Kitagawa.",
-    hot: false
+    hot: false,
+    img: "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?q=80&w=600&auto=format&fit=crop"
   },
   {
     cat: "manga",
@@ -146,7 +163,8 @@ const FALLBACK_NEWS = [
     date_str: "28 Mai 2026 · Édition",
     title: "Seven Seas annonce l'acquisition majeure de 17 nouvelles licences",
     text: "L'éditeur leader aux États-Unis muscle son offre manga et light novels pour 2026-2027. Cette offensive éditoriale confirme la vitalité insolente et la croissance ininterrompue du marché de la BD japonaise en Occident.",
-    hot: false
+    hot: false,
+    img: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=600&auto=format&fit=crop"
   },
   {
     cat: "collab",
@@ -154,7 +172,8 @@ const FALLBACK_NEWS = [
     date_str: "30 Mai 2026 · Collectibles",
     title: "Pop Mart et Disney dévoilent la collection Dimoo World exclusives",
     text: "Le leader mondial des blind boxes s'associe à Disney pour réinventer les personnages cultes. Ce drop destiné aux jeunes adultes génère un trafic massif en boutique physique et cartonne en unboxing sur les réseaux sociaux.",
-    hot: false
+    hot: false,
+    img: "https://images.unsplash.com/photo-1599669454699-248893623440?q=80&w=600&auto=format&fit=crop"
   },
   {
     cat: "cine",
@@ -162,7 +181,8 @@ const FALLBACK_NEWS = [
     date_str: "29 Mai 2026 · Cinéma",
     title: "Spider-Man Brand New Day : Sony et Marvel déploient les premiers visuels",
     text: "La promotion s'intensifie autour du prochain volet de Tom Holland. Les partenaires de licensing (Lego, Hasbro) s'alignent pour une déferlante de produits dérivés prévue en rayon dès fin juin pour l'été.",
-    hot: false
+    hot: false,
+    img: "https://images.unsplash.com/photo-1604200213928-ba3cf4fc8436?q=80&w=600&auto=format&fit=crop"
   },
   {
     cat: "cine",
@@ -170,7 +190,8 @@ const FALLBACK_NEWS = [
     date_str: "30 Mai 2026 · Box-Office",
     title: "Cannes 2026 : Le palmarès officiel dévoilé, impact attendu en salle",
     text: "Le 79e Festival de Cannes a remis ses prix ce samedi soir. Les exploitants de salles de cinéma prévoient un regain de fréquentation pour les films primés, stimulant la vente de tickets et les abonnements.",
-    hot: false
+    hot: false,
+    img: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?q=80&w=600&auto=format&fit=crop"
   },
   {
     cat: "series",
@@ -178,7 +199,8 @@ const FALLBACK_NEWS = [
     date_str: "29 Mai 2026 · Streaming",
     title: "Jujutsu Kaisen S2 maintient sa domination dans le Top 5 Netflix",
     text: "La diffusion continue en streaming maintient la licence dans le haut des charts. Le sell-out du merchandising associé (vêtements, accessoires de bureau) montre une stabilité commerciale rare et très lucrative pour les revendeurs.",
-    hot: false
+    hot: false,
+    img: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=600&auto=format&fit=crop"
   }
 ];
 
