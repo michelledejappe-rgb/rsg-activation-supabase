@@ -139,6 +139,7 @@ export default function Home() {
       <header className="qg-header">
         <div className="header-container">
           <Link href="/" className="logo-section">
+            <img src="/logo.png" alt="Road Sixty Geek Logo" className="logo-img" />
             <span className="logo-text">ROAD SIXTY GEEK</span>
             <span className="logo-tag">QG Actu</span>
           </Link>
