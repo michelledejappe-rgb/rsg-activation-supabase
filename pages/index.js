@@ -67,246 +67,242 @@ export default function Home() {
   }, [showStoryStudio, selectedSticker, activeNewsItem]);
 
   // Fonction de rendu Canvas pour générer un visuel Story HD (1080x1920 px)
-  const renderStory = (stickerType) => {
+  const renderStory = async (stickerType) => {
     if (!activeNewsItem) return;
     setGeneratingStory(true);
     
+    // Helper pour charger une image en promesse
+    const loadImage = (src) => {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);
+        img.src = src;
+      });
+    };
+
+    // Charger les images en parallèle (le visuel de l'actu via le proxy et le logo officiel)
+    const imgUrl = activeNewsItem.img ? `/api/proxy-image?url=${encodeURIComponent(activeNewsItem.img)}` : null;
+    const [mainImg, logoImg] = await Promise.all([
+      imgUrl ? loadImage(imgUrl) : Promise.resolve(null),
+      loadImage('/logo.png')
+    ]);
+
     const canvas = document.createElement('canvas');
     canvas.width = 1080;
     canvas.height = 1920;
     const ctx = canvas.getContext('2d');
     
-    // Fond Dégradé Sombre
+    // Fond Dégradé Ultra-Premium sombre
     const gradient = ctx.createLinearGradient(0, 0, 0, 1920);
-    gradient.addColorStop(0, '#0f172a');
-    gradient.addColorStop(0.5, '#020617');
-    gradient.addColorStop(1, '#0f172a');
+    gradient.addColorStop(0, '#030712'); // zinc-950
+    gradient.addColorStop(0.5, '#080c14');
+    gradient.addColorStop(1, '#020617'); // slate-950
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 1080, 1920);
     
-    // Lueurs d'ambiance radiales
-    const radialGlowTop = ctx.createRadialGradient(540, 200, 50, 540, 200, 600);
-    radialGlowTop.addColorStop(0, 'rgba(234, 179, 8, 0.18)');
+    // Lueurs d'ambiance radiales néon (Jaune R6G en haut, Rose en bas)
+    const radialGlowTop = ctx.createRadialGradient(540, 150, 50, 540, 150, 700);
+    radialGlowTop.addColorStop(0, 'rgba(234, 179, 8, 0.15)');
     radialGlowTop.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = radialGlowTop;
     ctx.fillRect(0, 0, 1080, 1920);
     
-    const radialGlowBottom = ctx.createRadialGradient(540, 1600, 50, 540, 1600, 600);
-    radialGlowBottom.addColorStop(0, 'rgba(219, 39, 119, 0.1)');
+    const radialGlowBottom = ctx.createRadialGradient(540, 1500, 50, 540, 1500, 700);
+    radialGlowBottom.addColorStop(0, 'rgba(219, 39, 119, 0.08)');
     radialGlowBottom.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = radialGlowBottom;
     ctx.fillRect(0, 0, 1080, 1920);
 
-    // Trame de points Dot-Grid
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
+    // Trame de points Dot-Grid subtile
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
     for (let x = 20; x < 1080; x += 40) {
       for (let y = 20; y < 1920; y += 40) {
         ctx.beginPath();
-        ctx.arc(x, y, 2, 0, Math.PI * 2);
+        ctx.arc(x, y, 1.5, 0, Math.PI * 2);
         ctx.fill();
       }
     }
 
-    // Charger l'image avec support CORS anonyme
-    const mainImg = new Image();
-    mainImg.crossOrigin = "anonymous";
+    // 1. Dessiner le Logo Officiel de Road Sixty Geek en haut
+    if (logoImg) {
+      const logoW = 340;
+      const logoH = logoImg.height * (logoW / logoImg.width);
+      ctx.drawImage(logoImg, 540 - logoW / 2, 70, logoW, logoH);
+    } else {
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 36px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('ROAD SIXTY GEEK', 540, 100);
+    }
+
+    // 2. Dessiner le Visuel Central (Grand rectangle aux bords arrondis)
+    const imgX = 80;
+    const imgY = 220;
+    const imgW = 920;
+    const imgH = 920; // Carré parfait à fort impact visuel
+    const imgRadius = 24;
     
-    const drawContent = () => {
-      // Cadre Polaroid Central
-      const cardX = 90;
-      const cardY = 320;
-      const cardW = 900;
-      const cardH = 720;
-      const cardRadius = 32;
+    ctx.save();
+    // Ombre portée sous le visuel
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+    ctx.shadowBlur = 40;
+    ctx.shadowOffsetY = 15;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+    drawRoundedRect(ctx, imgX, imgY, imgW, imgH, imgRadius);
+    ctx.fill();
+    ctx.restore();
+
+    ctx.save();
+    ctx.beginPath();
+    drawRoundedRect(ctx, imgX, imgY, imgW, imgH, imgRadius);
+    ctx.clip();
+    
+    if (mainImg && mainImg.naturalWidth > 0) {
+      const imgRatio = mainImg.width / mainImg.height;
+      const boxRatio = imgW / imgH;
+      let srcX = 0, srcY = 0, srcW = mainImg.width, srcH = mainImg.height;
       
-      // Ombre du cadre
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-      ctx.shadowBlur = 40;
-      ctx.shadowOffsetY = 15;
-      
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.98)';
-      drawRoundedRect(ctx, cardX, cardY, cardW, cardH, cardRadius);
-      ctx.fill();
-      
-      // Reset de l'ombre
-      ctx.shadowColor = 'transparent';
-      ctx.shadowBlur = 0;
-      ctx.shadowOffsetY = 0;
-      
-      // Image à l'intérieur
-      const imgX = cardX + 30;
-      const imgY = cardY + 30;
-      const imgW = cardW - 60;
-      const imgH = cardH - 180;
-      const imgRadius = 16;
-      
-      ctx.save();
-      ctx.beginPath();
-      drawRoundedRect(ctx, imgX, imgY, imgW, imgH, imgRadius);
-      ctx.clip();
-      
-      try {
-        if (mainImg.complete && mainImg.naturalWidth > 0) {
-          const imgRatio = mainImg.width / mainImg.height;
-          const boxRatio = imgW / imgH;
-          let srcX = 0, srcY = 0, srcW = mainImg.width, srcH = mainImg.height;
-          
-          if (imgRatio > boxRatio) {
-            srcW = mainImg.height * boxRatio;
-            srcX = (mainImg.width - srcW) / 2;
-          } else {
-            srcH = mainImg.width / boxRatio;
-            srcY = (mainImg.height - srcH) / 2;
-          }
-          ctx.drawImage(mainImg, srcX, srcY, srcW, srcH, imgX, imgY, imgW, imgH);
-        } else {
-          throw new Error();
-        }
-      } catch (e) {
-        // Fallback dégradé néon + émoji si l'image ne charge pas (CORS ou inexistant)
-        const neonGrad = ctx.createLinearGradient(imgX, imgY, imgX, imgY + imgH);
-        neonGrad.addColorStop(0, '#eab308');
-        neonGrad.addColorStop(1, '#db2777');
-        ctx.fillStyle = neonGrad;
-        ctx.fillRect(imgX, imgY, imgW, imgH);
-        
-        ctx.font = '140px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillStyle = '#ffffff';
-        ctx.fillText(activeNewsItem.emoji || '📰', imgX + imgW / 2, imgY + imgH / 2);
+      if (imgRatio > boxRatio) {
+        srcW = mainImg.height * boxRatio;
+        srcX = (mainImg.width - srcW) / 2;
+      } else {
+        srcH = mainImg.width / boxRatio;
+        srcY = (mainImg.height - srcH) / 2;
       }
-      ctx.restore();
-
-      // Texte de la photo Polaroid
-      ctx.fillStyle = '#0f172a';
-      ctx.font = 'bold 34px sans-serif';
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'top';
-      ctx.fillText(`🛡️ ROAD SIXTY GEEK • ACTUALITÉ`, imgX, imgY + imgH + 45);
+      ctx.drawImage(mainImg, srcX, srcY, srcW, srcH, imgX, imgY, imgW, imgH);
+    } else {
+      // Fallback dégradé néon + émoji si l'image ne charge pas
+      const neonGrad = ctx.createLinearGradient(imgX, imgY, imgX, imgY + imgH);
+      neonGrad.addColorStop(0, '#eab308');
+      neonGrad.addColorStop(1, '#db2777');
+      ctx.fillStyle = neonGrad;
+      ctx.fillRect(imgX, imgY, imgW, imgH);
       
-      ctx.fillStyle = '#64748b';
-      ctx.font = '700 26px sans-serif';
-      ctx.fillText(getDisplayTime(activeNewsItem).toUpperCase(), imgX, imgY + imgH + 95);
-
-      // Header de la Story
-      ctx.textAlign = 'center';
-      ctx.fillStyle = '#eab308';
-      ctx.beginPath();
-      ctx.moveTo(540, 100);
-      ctx.lineTo(580, 115);
-      ctx.lineTo(570, 175);
-      ctx.lineTo(540, 200);
-      ctx.lineTo(510, 175);
-      ctx.lineTo(500, 115);
-      ctx.closePath();
-      ctx.fill();
-      
-      ctx.fillStyle = '#000000';
-      ctx.font = 'bold 40px sans-serif';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('QG', 540, 150);
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '900 44px sans-serif';
-      ctx.fillText('ROAD SIXTY GEEK', 540, 250);
-
-      // Sticker Hype Diagonal
-      const STICKERS = {
-        hype: { label: '🔥 HYPE MAXIMALE', color: '#eab308', textColor: '#000000' },
-        drop: { label: '🚨 ALERTE DROP', color: '#ef4444', textColor: '#ffffff' },
-        pepite: { label: '💎 PÉPITE GEEK', color: '#0891b2', textColor: '#ffffff' },
-        collection: { label: '💸 DIRECT EN COLLECTION', color: '#10b981', textColor: '#ffffff' }
-      };
-      
-      const sticker = STICKERS[stickerType] || STICKERS.hype;
-      
-      ctx.save();
-      ctx.translate(540, 1100);
-      ctx.rotate(-0.05);
-      
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-      ctx.shadowBlur = 15;
-      ctx.shadowOffsetY = 5;
-      
-      ctx.fillStyle = sticker.color;
-      drawRoundedRect(ctx, -380, -45, 760, 90, 16);
-      ctx.fill();
-      
-      ctx.shadowColor = 'transparent';
-      ctx.shadowBlur = 0;
-      
-      ctx.fillStyle = sticker.textColor;
-      ctx.font = '900 36px sans-serif';
+      ctx.font = '160px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(`//  ${sticker.label}  //`, 0, 0);
-      ctx.restore();
-
-      // Titre & Description de la Story
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'top';
-      
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 48px sans-serif';
-      const maxTitleWidth = 900;
-      const startX = 90;
-      let startY = 1240;
-      
-      const titleLines = wrapText(ctx, activeNewsItem.title, maxTitleWidth);
-      titleLines.forEach(line => {
-        ctx.fillText(line, startX, startY);
-        startY += 62;
-      });
-      
-      ctx.fillStyle = '#cbd5e1';
-      ctx.font = '500 28px sans-serif';
-      startY += 25;
-      
-      const cleanDesc = activeNewsItem.text.split('. ')[0] + '.';
-      const descLines = wrapText(ctx, cleanDesc, maxTitleWidth);
-      descLines.slice(0, 3).forEach(line => {
-        ctx.fillText(line, startX, startY);
-        startY += 42;
-      });
+      ctx.fillText(activeNewsItem.emoji || '📰', imgX + imgW / 2, imgY + imgH / 2);
+    }
+    ctx.restore();
 
-      // Footer : Sticker de Lien
-      const footerY = 1750;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-      ctx.shadowBlur = 12;
-      ctx.shadowOffsetY = 6;
+    // 3. Dessiner la carte de contenu (Glassmorphism moderne)
+    const cardX = 80;
+    const cardY = 1190;
+    const cardW = 920;
+    const cardH = 480;
+    const cardRadius = 24;
 
-      ctx.fillStyle = '#ffffff';
-      drawRoundedRect(ctx, 540 - 240, footerY - 45, 480, 90, 45);
-      ctx.fill();
-      
-      ctx.shadowColor = 'transparent';
-      ctx.shadowBlur = 0;
-      
-      ctx.fillStyle = '#0891b2';
-      ctx.font = 'bold 34px sans-serif';
-      ctx.fillText('🔗 roadsixtygeek.com', 540, footerY);
+    ctx.save();
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.78)'; // Deep slate-900 transparent
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+    ctx.lineWidth = 2;
+    drawRoundedRect(ctx, cardX, cardY, cardW, cardH, cardRadius);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
 
-      try {
-        const url = canvas.toDataURL('image/png');
-        setStoryImageUrl(url);
-      } catch (err) {
-        console.error("Canvas export error:", err);
-      } finally {
-        setGeneratingStory(false);
-      }
+    // 4. Catégorie et Date
+    const catLabel = CATEGORIES[activeNewsItem.cat]?.label.toUpperCase() || 'ACTU';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillStyle = '#eab308'; // Jaune emblématique
+    ctx.font = '900 24px sans-serif';
+    ctx.fillText(catLabel, cardX + 40, cardY + 40);
+
+    const dateStr = getDisplayTime(activeNewsItem).toUpperCase();
+    ctx.fillStyle = '#94a3b8'; // slate-400
+    ctx.font = '700 22px sans-serif';
+    const catWidth = ctx.measureText(catLabel).width;
+    ctx.fillText(`  •  ${dateStr}`, cardX + 40 + catWidth, cardY + 40);
+
+    // 5. Titre de l'article (Massif, gras, lisible)
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 42px sans-serif';
+    const maxTitleWidth = cardW - 80;
+    let startY = cardY + 95;
+    
+    const titleLines = wrapText(ctx, activeNewsItem.title, maxTitleWidth);
+    titleLines.slice(0, 3).forEach((line) => {
+      ctx.fillText(line, cardX + 40, startY);
+      startY += 54;
+    });
+
+    // 6. Excerpt / Description
+    ctx.fillStyle = '#cbd5e1'; // slate-300
+    ctx.font = '500 24px sans-serif';
+    startY += 15;
+    
+    const cleanDesc = activeNewsItem.text.split('. ')[0] + '.';
+    const descLines = wrapText(ctx, cleanDesc, maxTitleWidth);
+    descLines.slice(0, 3).forEach(line => {
+      ctx.fillText(line, cardX + 40, startY);
+      startY += 36;
+    });
+
+    // 7. Dessiner le Sticker Hype Diagonal (Superposé élégamment)
+    const STICKERS = {
+      hype: { label: '🔥 HYPE MAXIMALE', color: '#eab308', textColor: '#000000' },
+      drop: { label: '🚨 ALERTE DROP', color: '#ef4444', textColor: '#ffffff' },
+      pepite: { label: '💎 PÉPITE GEEK', color: '#06b6d4', textColor: '#ffffff' },
+      collection: { label: '💸 DIRECT COLLECTION', color: '#10b981', textColor: '#ffffff' }
     };
     
-    // Chargement intelligent de l'image
-    if (activeNewsItem.img) {
-      mainImg.onload = drawContent;
-      mainImg.onerror = drawContent;
-      mainImg.src = `/api/proxy-image?url=${encodeURIComponent(activeNewsItem.img)}`;
-    } else {
-      setTimeout(drawContent, 50);
+    const sticker = STICKERS[stickerType] || STICKERS.hype;
+    
+    ctx.save();
+    ctx.translate(imgX + imgW - 220, imgY + imgH - 10);
+    ctx.rotate(0.04);
+    
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+    ctx.shadowBlur = 15;
+    ctx.shadowOffsetY = 6;
+    
+    ctx.fillStyle = sticker.color;
+    drawRoundedRect(ctx, -200, -35, 400, 70, 12);
+    ctx.fill();
+    
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    
+    ctx.fillStyle = sticker.textColor;
+    ctx.font = '900 22px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(sticker.label, 0, 0);
+    ctx.restore();
+
+    // 8. Footer Link
+    const footerY = 1770;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    ctx.save();
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+    ctx.shadowBlur = 10;
+    ctx.shadowOffsetY = 4;
+
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+    ctx.lineWidth = 1.5;
+    drawRoundedRect(ctx, 540 - 200, footerY - 40, 400, 80, 40);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+    
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 24px sans-serif';
+    ctx.fillText('🔗 roadsixtygeek.com', 540, footerY);
+
+    try {
+      const url = canvas.toDataURL('image/png');
+      setStoryImageUrl(url);
+    } catch (err) {
+      console.error("Canvas export error:", err);
+    } finally {
+      setGeneratingStory(false);
     }
   };
 
@@ -473,6 +469,31 @@ export default function Home() {
       potential: item.hot ? 'Légendaire' : 'Énorme',
       target: item.hot ? 'Hype Générale' : 'Très Attendu'
     };
+  }
+
+  // Obtenir un commentaire de la Rédac dynamique et réactif selon la catégorie et le vote
+  function getDynamicComment(item) {
+    const vote = votes[item.title];
+    if (vote === 'hype') {
+      return `🔥 Fandom en ébullition ! Votre vote "Direct dans ma collection" rejoint l'avis unanime de notre communauté. Cette nouveauté s'impose déjà comme un classique incontournable du moment. Attendez-vous à un épuisement rapide des stocks dès son lancement officiel !`;
+    } else if (vote === 'flop') {
+      return `💸 Avis de sagesse ! En choisissant de "passer votre tour", vous reflétez une frange prudente des collectionneurs. Entre prix élevés et exclusivités parfois superflues, la communauté conseille d'attendre des retours plus poussés avant d'investir. Un choix réfléchi.`;
+    }
+    
+    switch (item.cat) {
+      case 'collab':
+        return `🤝 La folie du cross-licensing ! Les collaborations de marques comme LEGO, Uniqlo ou Casio continuent de dominer le retail de pop-culture. Les fans apprécient particulièrement les accessoires exclusifs offerts à l'achat. Préparez-vous à des files d'attente virtuelles !`;
+      case 'anime':
+        return `🌸 L'âge d'or de l'animation ! Qu'il s'agisse d'ufotable ou de MAPPA, chaque visuel ou annonce d'anniversaire fait trembler la fanbase. L'engagement organique constaté sur les réseaux présage un engouement massif sur tous les produits dérivés et figurines de la licence.`;
+      case 'manga':
+        return `📖 Édition en effervescence ! Qu'il s'agisse d'un cap de ventes historique ou de l'entrée dans un arc final, le public français confirme son amour inconditionnel pour les versions collectors reliées. Les librairies et corners de grande distribution s'attendent à un trafic record.`;
+      case 'cine':
+        return `🎬 Box-office pop-culturel ! Les géants du divertissement déploient des trésors de promotion pour leurs blockbusters d'animation ou de super-héros. Cet impact culturel direct va se traduire par un raz-de-marée de merchandising en magasin spécialisé tout au long de la saison.`;
+      case 'series':
+        return `📺 La guerre du streaming ! L'arrivée surprise de licences fortes ou de suites d'animés sur Netflix et Crunchyroll maintient le fandom sous tension créative. Un booster d'audiences exceptionnel qui soutient également la valorisation des collections physiques associées.`;
+      default:
+        return `🛡️ L'avis du QG : Une annonce passionnante qui fait déjà vibrer la communauté geek. L'engouement sur notre fil Instagram montre que les passionnés attendent ce drop de pied ferme. Un événement pop-culturel majeur à suivre de très près !`;
+    }
   }
 
   return (
@@ -907,7 +928,7 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="analysis-commentary">
-                  <strong>Le mot de la Rédac :</strong> Cette annonce fait déjà vibrer toute la communauté geek sur les réseaux ! L'engouement constaté notamment sur notre compte Instagram montre que les passionnés attendent ce drop au tournant. Préparez-vous et restez à l'affût, les stocks risquent de s'écouler à vitesse grand V dès la sortie officielle !
+                  <strong>Le mot de la Rédac :</strong> {getDynamicComment(activeNewsItem)}
                 </div>
               </div>
 
