@@ -2,7 +2,7 @@ name: Synchronisation QG News
 
 on:
   schedule:
-    - cron: '0 * * * *' # S'exécute automatiquement toutes les heures
+    - cron: '0 6,10,16 * * *' # S'exécute à 8h, 12h et 18h (heure de Bruxelles - CEST / UTC+2)
   workflow_dispatch: # Permet de déclencher la synchronisation d'un simple clic sur GitHub
 
 jobs:
@@ -24,4 +24,6 @@ jobs:
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          GOOGLE_CX: ${{ secrets.GOOGLE_CX }}
         run: node scripts/update_news.js
