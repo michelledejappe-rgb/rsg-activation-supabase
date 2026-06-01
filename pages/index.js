@@ -67,290 +67,63 @@ export default function Home() {
   }, [showStoryStudio, selectedSticker, activeNewsItem]);
 
   // Fonction de rendu Canvas pour générer un visuel Story HD (1080x1920 px)
+  // Fonction de rendu DOM-to-Image pour générer un visuel Story HD (1080x1920 px) digne d'une agence
   const renderStory = async (stickerType) => {
     if (!activeNewsItem) return;
     setGeneratingStory(true);
     
-    // Helper pour charger une image en promesse
-    const loadImage = (src) => {
-      return new Promise((resolve) => {
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-        img.onload = () => resolve(img);
-        img.onerror = () => resolve(null);
-        img.src = src;
-      });
-    };
-
-    // Charger les images en parallèle (le visuel de l'actu via le proxy et le logo officiel)
-    const imgUrl = activeNewsItem.img ? `/api/proxy-image?url=${encodeURIComponent(activeNewsItem.img)}` : null;
-    const [mainImg, logoImg] = await Promise.all([
-      imgUrl ? loadImage(imgUrl) : Promise.resolve(null),
-      loadImage('/logo.png')
-    ]);
-
-    const canvas = document.createElement('canvas');
-    canvas.width = 1080;
-    canvas.height = 1920;
-    const ctx = canvas.getContext('2d');
-    
-    // Fond Dégradé Ultra-Premium sombre
-    const gradient = ctx.createLinearGradient(0, 0, 0, 1920);
-    gradient.addColorStop(0, '#030712'); // zinc-950
-    gradient.addColorStop(0.5, '#080c14');
-    gradient.addColorStop(1, '#020617'); // slate-950
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, 1080, 1920);
-    
-    // Lueurs d'ambiance radiales néon (Jaune R6G en haut, Rose en bas)
-    const radialGlowTop = ctx.createRadialGradient(540, 150, 50, 540, 150, 700);
-    radialGlowTop.addColorStop(0, 'rgba(234, 179, 8, 0.15)');
-    radialGlowTop.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = radialGlowTop;
-    ctx.fillRect(0, 0, 1080, 1920);
-    
-    const radialGlowBottom = ctx.createRadialGradient(540, 1500, 50, 540, 1500, 700);
-    radialGlowBottom.addColorStop(0, 'rgba(219, 39, 119, 0.08)');
-    radialGlowBottom.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = radialGlowBottom;
-    ctx.fillRect(0, 0, 1080, 1920);
-
-    // Trame de points Dot-Grid subtile
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
-    for (let x = 20; x < 1080; x += 40) {
-      for (let y = 20; y < 1920; y += 40) {
-        ctx.beginPath();
-        ctx.arc(x, y, 1.5, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-
-    // 1. Dessiner le Logo Officiel de Road Sixty Geek à un emplacement stratégique hors de la zone de sécurité d'Instagram (y=210)
-    if (logoImg) {
-      const logoW = 300; // Légèrement plus élégant et raffiné
-      const logoH = logoImg.height * (logoW / logoImg.width);
-      ctx.drawImage(logoImg, 540 - logoW / 2, 210, logoW, logoH);
-    } else {
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 36px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('ROAD SIXTY GEEK', 540, 240);
-    }
-
-    // 2. Dessiner le Visuel Central (Abaissé à y=400 pour laisser respirer le logo et éviter les masquages du notch/menu d'Instagram)
-    const imgX = 80;
-    const imgY = 400;
-    const imgW = 920;
-    const imgH = 780; // Format poster horizontal d'un grand équilibre de composition
-    const imgRadius = 24;
-    
-    ctx.save();
-    // Ombre portée sous le visuel
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
-    ctx.shadowBlur = 45;
-    ctx.shadowOffsetY = 18;
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
-    drawRoundedRect(ctx, imgX, imgY, imgW, imgH, imgRadius);
-    ctx.fill();
-    ctx.restore();
-
-    ctx.save();
-    ctx.beginPath();
-    drawRoundedRect(ctx, imgX, imgY, imgW, imgH, imgRadius);
-    ctx.clip();
-    
-    if (mainImg && mainImg.naturalWidth > 0) {
-      const imgRatio = mainImg.width / mainImg.height;
-      const boxRatio = imgW / imgH;
-      let srcX = 0, srcY = 0, srcW = mainImg.width, srcH = mainImg.height;
-      
-      if (imgRatio > boxRatio) {
-        srcW = mainImg.height * boxRatio;
-        srcX = (mainImg.width - srcW) / 2;
-      } else {
-        srcH = mainImg.width / boxRatio;
-        srcY = (mainImg.height - srcH) / 2;
-      }
-      ctx.drawImage(mainImg, srcX, srcY, srcW, srcH, imgX, imgY, imgW, imgH);
-    } else {
-      // CONCEPTION GRAPHIQUE COMPLÈTE - FALLBACK "PICTO-ONLY" PRESTIGE (STYLE DA STREETWEAR & TECH ACCENTS)
-      const grad = ctx.createLinearGradient(imgX, imgY, imgX, imgY + imgH);
-      grad.addColorStop(0, '#1e1b4b'); // Indigo profond
-      grad.addColorStop(1, '#090d16');
-      ctx.fillStyle = grad;
-      ctx.fillRect(imgX, imgY, imgW, imgH);
-
-      // Grille Dot-Matrix subtile
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-      for (let gx = imgX + 35; gx < imgX + imgW; gx += 35) {
-        for (let gy = imgY + 35; gy < imgY + imgH; gy += 35) {
-          ctx.beginPath();
-          ctx.arc(gx, gy, 1.2, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
-
-      // Lignes de construction néon croisées en arrière-plan
-      ctx.strokeStyle = 'rgba(234, 179, 8, 0.12)'; // Jaune
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.moveTo(imgX + 80, imgY + 80);
-      ctx.lineTo(imgX + imgW - 80, imgY + imgH - 80);
-      ctx.stroke();
-
-      ctx.strokeStyle = 'rgba(219, 39, 119, 0.12)'; // Rose
-      ctx.beginPath();
-      ctx.moveTo(imgX + imgW - 80, imgY + 80);
-      ctx.lineTo(imgX + 80, imgY + imgH - 80);
-      ctx.stroke();
-
-      // Émoji en filigrane géant à très faible opacité
-      ctx.save();
-      ctx.globalAlpha = 0.05;
-      ctx.font = '360px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillStyle = '#ffffff';
-      ctx.fillText(activeNewsItem.emoji || '📰', imgX + imgW / 2, imgY + imgH / 2);
-      ctx.restore();
-
-      // Aura néon de mise en valeur centrale
-      const aura = ctx.createRadialGradient(
-        imgX + imgW / 2, imgY + imgH / 2, 20, 
-        imgX + imgW / 2, imgY + imgH / 2, 250
-      );
-      aura.addColorStop(0, 'rgba(234, 179, 8, 0.22)');
-      aura.addColorStop(0.5, 'rgba(219, 39, 119, 0.12)');
-      aura.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      ctx.fillStyle = aura;
-      ctx.beginPath();
-      ctx.arc(imgX + imgW / 2, imgY + imgH / 2, 250, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Émoji principal haute définition avec ombre portée
-      ctx.font = '180px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillStyle = '#ffffff';
-      ctx.save();
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
-      ctx.shadowBlur = 25;
-      ctx.shadowOffsetY = 12;
-      ctx.fillText(activeNewsItem.emoji || '📰', imgX + imgW / 2, imgY + imgH / 2);
-      ctx.restore();
-
-      // Étiquettes techniques (Tech spec branding digne d'un DA)
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
-      ctx.font = '700 18px monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText(`[ RSG // CREATIVE STICKER SYSTEM ]`, imgX + imgW / 2, imgY + imgH - 50);
-      
-      ctx.textAlign = 'left';
-      ctx.fillText(`SYS.NO // ${activeNewsItem.cat.toUpperCase()}_FLBK`, imgX + 45, imgY + 50);
-      ctx.textAlign = 'right';
-      ctx.fillText(`LAT.2026 // QG`, imgX + imgW - 45, imgY + 50);
-    }
-    ctx.restore();
-
-    // 3. Dessiner la carte de contenu (Positionnée à y=1230 avec plus de liberté)
-    const cardX = 80;
-    const cardY = 1230;
-    const cardW = 920;
-    const cardH = 430;
-    const cardRadius = 24;
-
-    ctx.save();
-    ctx.fillStyle = 'rgba(15, 23, 42, 0.85)'; // Slate-900 transparent d'une grande profondeur
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-    ctx.lineWidth = 2;
-    drawRoundedRect(ctx, cardX, cardY, cardW, cardH, cardRadius);
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
-
-    // Ligne néon verticale de design à gauche du texte
-    ctx.fillStyle = '#eab308';
-    ctx.fillRect(cardX + 35, cardY + 40, 6, cardH - 80);
-
-    // 4. Catégorie et Date (Décalés à droite de la règle verticale)
-    const catLabel = CATEGORIES[activeNewsItem.cat]?.label.toUpperCase() || 'ACTU';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'top';
-    ctx.fillStyle = '#eab308'; // Jaune emblématique
-    ctx.font = '900 24px sans-serif';
-    ctx.fillText(catLabel, cardX + 60, cardY + 40);
-
-    const dateStr = getDisplayTime(activeNewsItem).toUpperCase();
-    ctx.fillStyle = '#94a3b8'; // slate-400
-    ctx.font = '700 22px sans-serif';
-    const catWidth = ctx.measureText(catLabel).width;
-    ctx.fillText(`  •  ${dateStr}`, cardX + 60 + catWidth, cardY + 40);
-
-    // 5. Titre de l'article (Décalé à droite de la règle verticale)
-    ctx.fillStyle = '#ffffff';
-    ctx.font = '900 42px sans-serif';
-    const maxTitleWidth = cardW - 120;
-    let startY = cardY + 95;
-    
-    const titleLines = wrapText(ctx, activeNewsItem.title, maxTitleWidth);
-    titleLines.slice(0, 3).forEach((line) => {
-      ctx.fillText(line, cardX + 60, startY);
-      startY += 54;
-    });
-
-    // 6. Excerpt / Description (Décalé à droite de la règle verticale)
-    ctx.fillStyle = '#cbd5e1'; // slate-300
-    ctx.font = '500 24px sans-serif';
-    startY += 15;
-    
-    const cleanDesc = activeNewsItem.text.split('. ')[0] + '.';
-    const descLines = wrapText(ctx, cleanDesc, maxTitleWidth);
-    descLines.slice(0, 3).forEach(line => {
-      ctx.fillText(line, cardX + 60, startY);
-      startY += 36;
-    });
-
-    // 7. Dessiner le Sticker Hype Diagonal (Superposé élégamment, tourné légèrement pour un rendu streetwear spontané)
-    const STICKERS = {
-      hype: { label: '🔥 HYPE MAXIMALE', color: '#eab308', textColor: '#000000' },
-      drop: { label: '🚨 ALERTE DROP', color: '#ef4444', textColor: '#ffffff' },
-      pepite: { label: '💎 PÉPITE GEEK', color: '#06b6d4', textColor: '#ffffff' },
-      collection: { label: '💸 DIRECT COLLECTION', color: '#10b981', textColor: '#ffffff' }
-    };
-    
-    const sticker = STICKERS[stickerType] || STICKERS.hype;
-    
-    ctx.save();
-    ctx.translate(imgX + imgW - 220, imgY + imgH - 10);
-    ctx.rotate(0.04);
-    
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-    ctx.shadowBlur = 15;
-    ctx.shadowOffsetY = 6;
-    
-    ctx.fillStyle = sticker.color;
-    drawRoundedRect(ctx, -200, -35, 400, 70, 12);
-    ctx.fill();
-    
-    ctx.shadowColor = 'transparent';
-    ctx.shadowBlur = 0;
-    
-    ctx.fillStyle = sticker.textColor;
-    ctx.font = '900 22px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(sticker.label, 0, 0);
-    ctx.restore();
-
-    // 8. Footer Link supprimé au profit d'un minimalisme total (Plus de mention roadsixtygeek.com, laisse la place à la mention Instagram native de l'utilisateur)
-
     try {
-      const url = canvas.toDataURL('image/png');
-      setStoryImageUrl(url);
-    } catch (err) {
-      console.error("Canvas export error:", err);
-    } finally {
+      // Import dynamique côté client de html-to-image (SSR-safe)
+      const htmlToImage = await import('html-to-image');
+      
+      // Attendre un court cycle pour s'assurer du rendu correct du DOM Next.js
+      setTimeout(async () => {
+        const node = document.getElementById('r6g-story-template');
+        if (!node) {
+          setGeneratingStory(false);
+          return;
+        }
+        
+        try {
+          // Génération d'une URL de données PNG avec un ratio de pixels doublé pour une netteté absolue (Retina 300DPI)
+          const dataUrl = await htmlToImage.toPng(node, {
+            pixelRatio: 2,
+            skipFonts: true,
+            width: 1080,
+            height: 1920,
+            style: {
+              transform: 'scale(1)',
+              transformOrigin: 'top left'
+            }
+          });
+          setStoryImageUrl(dataUrl);
+        } catch (err) {
+          console.error("[Story Studio] Erreur html-to-image rendering:", err);
+        } finally {
+          setGeneratingStory(false);
+        }
+      }, 400);
+    } catch (e) {
+      console.error("[Story Studio] Erreur import dynamique html-to-image:", e);
       setGeneratingStory(false);
+    }
+  };
+
+  // Helper pour convertir une image base64 en Blob sans fetch (robuste sur tous les navigateurs)
+  const dataURLtoBlob = (dataurl) => {
+    try {
+      const arr = dataurl.split(',');
+      const mime = arr[0].match(/:(.*?);/)[1];
+      const bstr = atob(arr[1]);
+      let n = bstr.length;
+      const u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      return new Blob([u8arr], { type: mime });
+    } catch (e) {
+      console.error("Error converting data URL to blob:", e);
+      return null;
     }
   };
 
@@ -358,8 +131,12 @@ export default function Home() {
   const shareStory = async () => {
     if (!storyImageUrl) return;
     try {
-      const res = await fetch(storyImageUrl);
-      const blob = await res.blob();
+      const blob = dataURLtoBlob(storyImageUrl);
+      if (!blob) {
+        triggerDownload();
+        return;
+      }
+      
       const file = new File([blob], `R6G_Story_${activeNewsItem.cat}.png`, { type: 'image/png' });
       
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -551,6 +328,9 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="description" content="Découvrez toute l'actualité pop culture, mangas, animes, cinéma et les collabs de marque les plus folles !" />
         <link rel="icon" href="/favicon.ico" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;500;700;900&display=swap" rel="stylesheet" />
         <link rel="canonical" href="https://roadsixtygeek.com" />
         <meta property="og:title" content="Road Sixty Geek (QG) — Actu Pop Culture, Mangas & Licences" />
         <meta property="og:description" content="Le portail ultime des nouveautés pop culture, mangas, animes, séries et drops collectors !" />
@@ -762,11 +542,20 @@ export default function Home() {
               feedNews.map((item, idx) => (
                 <div key={idx} className="news-card-item" onClick={() => setActiveNewsItem(item)}>
                   <div className="news-card-media">
-                    <div 
-                      className="news-card-media-img"
-                      style={{ backgroundImage: `url(${item.img || CATEGORY_IMAGES[item.cat]})`, opacity: 0.15 }}
-                    />
-                    <span className="news-card-emoji">{item.emoji}</span>
+                    {item.img ? (
+                      <div 
+                        className="news-card-media-img"
+                        style={{ backgroundImage: `url(${item.img})`, opacity: 1 }}
+                      />
+                    ) : (
+                      <>
+                        <div 
+                          className="news-card-media-img"
+                          style={{ backgroundImage: `url(${CATEGORY_IMAGES[item.cat]})`, opacity: 0.15 }}
+                        />
+                        <span className="news-card-emoji">{item.emoji}</span>
+                      </>
+                    )}
                   </div>
 
                   <div className="news-card-info">
@@ -917,8 +706,12 @@ export default function Home() {
               className="modal-banner" 
               style={{ backgroundImage: `url(${activeNewsItem.img || CATEGORY_IMAGES[activeNewsItem.cat]})` }}
             >
-              <div className="modal-banner-overlay" />
-              <span className="modal-banner-emoji">{activeNewsItem.emoji}</span>
+              {!activeNewsItem.img && (
+                <>
+                  <div className="modal-banner-overlay" />
+                  <span className="modal-banner-emoji">{activeNewsItem.emoji}</span>
+                </>
+              )}
             </div>
 
             <div className="modal-body">
@@ -1129,6 +922,200 @@ export default function Home() {
                   Retour
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Template de Story Masqué (1080x1920 px) - Rendu par html-to-image en tâche de fond */}
+      {/* Intégré dans un conteneur technique invisible mais peint à 100% pour contourner les optimisations mobiles de Safari/Chrome */}
+      {activeNewsItem && (
+        <div style={{ width: 0, height: 0, overflow: 'hidden', position: 'absolute', top: 0, left: 0, opacity: 0 }}>
+          <div 
+            id="r6g-story-template" 
+            style={{
+              width: '1080px',
+              height: '1920px',
+              position: 'relative',
+              background: 'linear-gradient(180deg, #030712 0%, #080c14 50%, #020617 100%)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              fontFamily: 'Montserrat, sans-serif',
+              overflow: 'hidden',
+              boxSizing: 'border-box',
+              padding: '80px'
+            }}
+          >
+            {/* Lueurs radiales colorées néon d'ambiance */}
+            <div style={{ position: 'absolute', top: '-100px', width: '800px', height: '800px', background: 'radial-gradient(circle, rgba(234, 179, 8, 0.16) 0%, rgba(0,0,0,0) 70%)', pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', bottom: '-100px', width: '800px', height: '800px', background: 'radial-gradient(circle, rgba(219, 39, 119, 0.08) 0%, rgba(0,0,0,0) 70%)', pointerEvents: 'none' }} />
+            
+            {/* Motif Dot-Grid rétro de Road Sixty Geek */}
+            <div className="story-dot-grid" style={{ position: 'absolute', inset: 0, opacity: 0.03, pointerEvents: 'none' }} />
+
+            {/* 1. Logo Officiel (Abaissé à y=130px dans le template pour la zone de sécurité) */}
+            <div style={{ marginTop: '130px', display: 'flex', justifyContent: 'center', width: '100%', zIndex: 10 }}>
+              <img 
+                src={typeof window !== 'undefined' ? `${window.location.origin}/logo.png` : '/logo.png'} 
+                alt="Road Sixty Geek" 
+                style={{ width: '280px', height: 'auto' }} 
+              />
+            </div>
+
+            {/* 2. Cadre Visuel Central (Format 4:5 - y=420px) */}
+            <div 
+              style={{
+                marginTop: '100px',
+                width: '920px',
+                height: '740px',
+                position: 'relative',
+                borderRadius: '24px',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                boxShadow: '0 30px 60px rgba(0, 0, 0, 0.8)',
+                overflow: 'hidden',
+                zIndex: 10
+              }}
+            >
+              {activeNewsItem?.img ? (
+                <img 
+                  src={typeof window !== 'undefined' && activeNewsItem.img.startsWith('/') ? `${window.location.origin}${activeNewsItem.img}` : activeNewsItem.img} 
+                  alt={activeNewsItem.title} 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                />
+              ) : (
+                /* CONCEPTION GRAPHIQUE "FALLBACK PRESTIGE" DICTIONNAIRE / MOCK */
+                <div 
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    background: 'linear-gradient(135deg, #1e1b4b 0%, #090d16 100%)',
+                    position: 'relative',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxSizing: 'border-box'
+                  }}
+                >
+                  {/* Grilles techniques */}
+                  <div className="story-fallback-grid" style={{ position: 'absolute', inset: 0, opacity: 0.04 }} />
+                  <div style={{ position: 'absolute', width: '100%', height: '1px', background: 'rgba(234, 179, 8, 0.12)', top: '10%' }} />
+                  <div style={{ position: 'absolute', width: '100%', height: '1px', background: 'rgba(219, 39, 119, 0.12)', bottom: '10%' }} />
+                  
+                  {/* Émoji géant en filigrane */}
+                  <div style={{ position: 'absolute', fontSize: '360px', opacity: 0.05, userSelect: 'none' }}>
+                    {activeNewsItem?.emoji || '📰'}
+                  </div>
+                  
+                  {/* Halo néon central */}
+                  <div style={{ position: 'absolute', width: '380px', height: '380px', background: 'radial-gradient(circle, rgba(234, 179, 8, 0.22) 0%, rgba(219, 39, 119, 0.12) 50%, rgba(0,0,0,0) 70%)' }} />
+                  
+                  {/* Émoji principal */}
+                  <div style={{ fontSize: '180px', zIndex: 5, filter: 'drop-shadow(0 15px 25px rgba(0,0,0,0.6))' }}>
+                    {activeNewsItem?.emoji || '📰'}
+                  </div>
+
+                  {/* Étiquettes techniques stencil style DA */}
+                  <div style={{ position: 'absolute', bottom: '40px', fontFamily: 'monospace', fontWeight: 'bold', fontSize: '18px', color: 'rgba(255, 255, 255, 0.35)', letterSpacing: '1px' }}>
+                    [ RSG // CREATIVE STICKER SYSTEM ]
+                  </div>
+                  <div style={{ position: 'absolute', top: '40px', left: '40px', fontFamily: 'monospace', fontWeight: 'bold', fontSize: '18px', color: 'rgba(255, 255, 255, 0.35)' }}>
+                    SYS.NO // {activeNewsItem?.cat?.toUpperCase()}_FLBK
+                  </div>
+                  <div style={{ position: 'absolute', top: '40px', right: '40px', fontFamily: 'monospace', fontWeight: 'bold', fontSize: '18px', color: 'rgba(255, 255, 255, 0.35)' }}>
+                    LAT.2026 // QG
+                  </div>
+                </div>
+              )}
+
+              {/* Sticker streetwear slanted diagonal */}
+              {selectedSticker && (
+                <div 
+                  style={{
+                    position: 'absolute',
+                    bottom: '30px',
+                    right: '30px',
+                    transform: 'rotate(2.5deg)',
+                    padding: '16px 36px',
+                    borderRadius: '12px',
+                    fontSize: '22px',
+                    fontWeight: 900,
+                    letterSpacing: '1px',
+                    boxShadow: '0 8px 20px rgba(0,0,0,0.4)',
+                    zIndex: 20,
+                    background: selectedSticker === 'hype' ? '#eab308' : selectedSticker === 'drop' ? '#ef4444' : selectedSticker === 'pepite' ? '#06b6d4' : '#10b981',
+                    color: selectedSticker === 'hype' ? '#000000' : '#ffffff'
+                  }}
+                >
+                  {selectedSticker === 'hype' && '🔥 HYPE MAXIMALE'}
+                  {selectedSticker === 'drop' && '🚨 ALERTE DROP'}
+                  {selectedSticker === 'pepite' && '💎 PÉPITE GEEK'}
+                  {selectedSticker === 'collection' && '💸 DIRECT COLLECTION'}
+                </div>
+              )}
+            </div>
+
+            {/* 3. Carte Typographique dépolie (y=1220px) */}
+            <div 
+              style={{
+                marginTop: '60px',
+                width: '920px',
+                minHeight: '430px',
+                background: 'rgba(15, 23, 42, 0.85)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '24px',
+                boxSizing: 'border-box',
+                padding: '50px 50px 50px 80px',
+                position: 'relative',
+                zIndex: 10,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-start'
+              }}
+            >
+              {/* Règle verticale néon */}
+              <div style={{ position: 'absolute', left: '35px', top: '50px', bottom: '50px', width: '6px', background: '#eab308', borderRadius: '4px' }} />
+
+              {/* Catégorie et Date */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '15px' }}>
+                <span style={{ fontSize: '24px', fontWeight: 900, color: '#eab308', letterSpacing: '1.5px' }}>
+                  {CATEGORIES[activeNewsItem?.cat]?.label?.toUpperCase() || 'ACTU'}
+                </span>
+                <span style={{ fontSize: '22px', fontWeight: 700, color: '#94a3b8' }}>
+                  • {activeNewsItem ? getDisplayTime(activeNewsItem).toUpperCase() : ''}
+                </span>
+              </div>
+
+              {/* Titre Impact condensé en Bebas Neue */}
+              <h2 
+                style={{ 
+                  fontSize: '54px', 
+                  fontWeight: 900, 
+                  color: '#ffffff', 
+                  margin: 0, 
+                  padding: 0, 
+                  lineHeight: '58px',
+                  letterSpacing: '0.5px',
+                  fontFamily: 'Bebas Neue, sans-serif'
+                }}
+              >
+                {activeNewsItem?.title}
+              </h2>
+
+              {/* Excerpt en Montserrat */}
+              <p 
+                style={{ 
+                  fontSize: '25px', 
+                  fontWeight: 500, 
+                  color: '#cbd5e1', 
+                  margin: '18px 0 0 0', 
+                  padding: 0, 
+                  lineHeight: '36px',
+                  fontFamily: 'Montserrat, sans-serif'
+                }}
+              >
+                {activeNewsItem?.text?.split('. ')[0] || ''}.
+              </p>
             </div>
           </div>
         </div>

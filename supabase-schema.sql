@@ -7,8 +7,12 @@ create table if not exists news (
   title text not null unique, -- Titre de l'article (unique pour éviter les doublons au sync)
   text text not null,         -- Contenu/Description de l'actualité
   hot boolean default false,  -- Si l'actualité est importante/brûlante (Hero Section)
+  img text,                   -- URL de l'image réelle exacte (DuckDuckGo/Unsplash) récupérée par le Cron
   published_at timestamp with time zone default now() -- Date réelle d'insertion
 );
+
+-- Instruction de migration pour les bases existantes :
+-- ALTER TABLE news ADD COLUMN IF NOT EXISTS img text;
 
 -- Activation de la sécurité de niveau ligne (Row-Level Security)
 alter table news enable row level security;

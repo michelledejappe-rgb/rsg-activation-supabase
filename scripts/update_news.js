@@ -119,10 +119,68 @@ async function fetchFromGoogleAPI(query) {
 }
 
 // =========================================================
-// Source 1b — Moteur de recherche Bing & Yahoo (index DuckDuckGo sans clé d'API)
-// Idéal car Google a restreint l'API Custom Search en 2026 pour les nouveaux projets.
+// Source 1b — Moteur de recherche Bing & Yahoo (Direct scraping + Index fallback unifié)
 // =========================================================
 async function fetchFromBingYahoo(query) {
+  // --- ÉTAPE 1 : Recherche Directe sur Bing Images (Index Bing) ---
+  try {
+    const url = `https://www.bing.com/images/search?q=${encodeURIComponent(query)}&cc=FR&setlang=fr&safeSearch=moderate&first=1`;
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Language': 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7',
+        'Referer': 'https://www.bing.com/',
+        'Cache-Control': 'max-age=0'
+      },
+      signal: AbortSignal.timeout(5000)
+    });
+    if (res.ok) {
+      const html = await res.text();
+      const murlRegex = /&quot;murl&quot;:&quot;(https?:\/\/[^&"]+?)&quot;/g;
+      const matches = [...html.matchAll(murlRegex)].map(m => m[1]);
+      if (matches.length > 0) {
+        const img = matches.find(u => /\.(jpg|jpeg|png|webp)/i.test(u));
+        if (img) {
+          console.log(`[Cron Image] ✅ Bing Images Direct → ${img}`);
+          return img;
+        }
+      }
+    }
+  } catch (e) {
+    console.warn(`[Cron Image] Échec direct Bing Images: ${e.message}`);
+  }
+
+  // --- ÉTAPE 2 : Recherche Directe sur Yahoo Images (Index Yahoo) ---
+  try {
+    const url = `https://images.search.yahoo.com/search/images?p=${encodeURIComponent(query)}&imgsz=large`;
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7',
+        'Referer': 'https://images.search.yahoo.com/'
+      },
+      signal: AbortSignal.timeout(5000)
+    });
+    if (res.ok) {
+      const html = await res.text();
+      const ouMatches = [...html.matchAll(/"ou":"(https?:\/\/[^"]+?)"/g)].map(m => m[1]);
+      const iurlMatches = [...html.matchAll(/"iurl":"(https?:\/\/[^"]+?)"/g)].map(m => m[1].replace(/\\/g, ''));
+      const combined = [...ouMatches, ...iurlMatches];
+      if (combined.length > 0) {
+        const img = combined.find(u => /\.(jpg|jpeg|png|webp)/i.test(u));
+        if (img) {
+          console.log(`[Cron Image] ✅ Yahoo Images Direct → ${img}`);
+          return img;
+        }
+      }
+    }
+  } catch (e) {
+    console.warn(`[Cron Image] Échec direct Yahoo Images: ${e.message}`);
+  }
+
+  // --- ÉTAPE 3 : Index unifié Bing & Yahoo (Fallback de secours résilient) ---
   try {
     const htmlUrl = `https://duckduckgo.com/?q=${encodeURIComponent(query)}`;
     const resHtml = await fetch(htmlUrl, {
@@ -150,12 +208,12 @@ async function fetchFromBingYahoo(query) {
     if (data.results && data.results.length > 0) {
       const img = data.results.find(i => /\.(jpg|jpeg|png|webp)/i.test(i.image))?.image;
       if (img) {
-        console.log(`[Cron Image] ✅ Bing & Yahoo → ${img}`);
+        console.log(`[Cron Image] ✅ Index Bing & Yahoo unifié (DDG fallback) → ${img}`);
         return img;
       }
     }
   } catch (e) {
-    console.warn(`[Cron Image] Bing & Yahoo : ${e.message}`);
+    console.warn(`[Cron Image] Échec Index unifié Bing & Yahoo: ${e.message}`);
   }
   return null;
 }
