@@ -304,7 +304,7 @@ export default function Home() {
     if (activeNewsItem.img) {
       mainImg.onload = drawContent;
       mainImg.onerror = drawContent;
-      mainImg.src = activeNewsItem.img;
+      mainImg.src = `/api/proxy-image?url=${encodeURIComponent(activeNewsItem.img)}`;
     } else {
       setTimeout(drawContent, 50);
     }
