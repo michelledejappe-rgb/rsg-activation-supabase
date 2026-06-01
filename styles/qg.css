@@ -812,7 +812,7 @@ body {
   letter-spacing: 0.5px;
 }
 
-/* Responsive Styles */
+/* Responsive Styles & Premium Mobile UX */
 @media (max-width: 1024px) {
   .mosaic-grid {
     grid-template-columns: 1fr;
@@ -830,38 +830,336 @@ body {
 }
 
 @media (max-width: 768px) {
-  .news-card-item {
+  .qg-hero-header {
+    margin: 2rem auto 1.5rem auto;
+    padding: 0 1.2rem;
+  }
+
+  .hero-title {
+    font-size: 1.8rem;
+  }
+
+  .hero-desc {
+    font-size: 0.9rem;
+  }
+
+  .qg-mosaic-section {
+    padding: 0 1.2rem;
+    margin-bottom: 2rem;
+  }
+
+  .mosaic-grid {
     grid-template-columns: 1fr;
-  }
-  
-  .news-card-media {
-    height: 100px;
-  }
-  
-  .header-container {
-    flex-direction: column;
     gap: 15px;
   }
-  
+
+  .mosaic-main {
+    min-height: 260px;
+  }
+
+  .mosaic-content {
+    padding: 1.2rem;
+    gap: 8px;
+  }
+
+  .mosaic-title {
+    font-size: 1.25rem;
+  }
+
+  .mosaic-text {
+    display: none !important; /* Masquer la description sur mobile pour éviter la surcharge */
+  }
+
+  /* Carrousel vedette tactile horizontal élégant */
+  .hero-side-stack {
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory !important;
+    gap: 12px;
+    padding: 6px 4px !important;
+    margin: 0 -1.2rem !important; /* Permet aux cartes de déborder joliment sur les bords */
+    padding-left: 1.2rem !important;
+    padding-right: 1.2rem !important;
+    scrollbar-width: none !important; /* Firefox */
+    -ms-overflow-style: none !important; /* IE */
+    -webkit-overflow-scrolling: touch !important; /* Inertie iOS */
+  }
+
+  .hero-side-stack::-webkit-scrollbar {
+    display: none !important; /* Masque la scrollbar */
+  }
+
+  .mosaic-side-card {
+    flex: 0 0 82% !important; /* 82% de largeur pour laisser entrevoir la carte suivante */
+    scroll-snap-align: start !important;
+    min-width: 270px;
+    min-height: 130px !important;
+    padding: 1rem !important;
+  }
+
+  .side-card-title {
+    font-size: 0.95rem;
+    -webkit-line-clamp: 2;
+  }
+
+  .side-card-text {
+    display: none !important;
+  }
+
+  .qg-main-layout {
+    padding: 0 1.2rem;
+    gap: 25px;
+  }
+
+  .header-container {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .logo-section {
+    gap: 8px;
+  }
+
+  .logo-img {
+    height: 28px;
+  }
+
+  .logo-text {
+    font-size: 1.05rem;
+  }
+
+  .logo-tag {
+    font-size: 0.6rem;
+    padding: 1px 6px;
+  }
+
+  .header-meta {
+    gap: 8px;
+  }
+
+  .play-quiz-btn {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+  }
+
+  .sync-badge {
+    padding: 4px 10px;
+    font-size: 0.7rem;
+  }
+
   .qg-filter-bar {
     flex-direction: column;
     align-items: stretch;
+    gap: 12px;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Onglets de catégorie sans scrollbar inélégante */
+  .category-tabs {
+    padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
   }
   
+  .category-tabs::-webkit-scrollbar {
+    display: none !important;
+  }
+
   .search-wrapper {
     min-width: 100%;
   }
-  
-  .mosaic-title {
-    font-size: 1.6rem;
+
+  .news-card-item {
+    grid-template-columns: 100px 1fr;
+    gap: 12px;
+    padding: 0.9rem;
   }
-  
-  .mosaic-content {
-    padding: 1.5rem;
+
+  .news-card-media {
+    height: 80px;
+    width: 100px;
+  }
+
+  .news-card-emoji {
+    font-size: 2rem;
+  }
+
+  .news-card-title {
+    font-size: 0.95rem;
+  }
+
+  .news-card-text {
+    font-size: 0.8rem;
+    -webkit-line-clamp: 2;
   }
 }
 
-/* Interactive Premium News Modal */
+@media (max-width: 576px) {
+  .qg-header {
+    padding: 0.6rem 1rem !important;
+  }
+
+  .header-container {
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    gap: 8px !important;
+  }
+
+  .logo-section {
+    width: auto !important;
+    justify-content: flex-start !important;
+    gap: 6px !important;
+  }
+
+  .logo-img {
+    height: 24px !important;
+  }
+
+  .logo-text {
+    font-size: 0.9rem !important;
+  }
+
+  .logo-tag {
+    font-size: 0.55rem !important;
+    padding: 1px 4px !important;
+  }
+
+  .header-meta {
+    width: auto !important;
+    justify-content: flex-end !important;
+    gap: 6px !important;
+  }
+
+  .sync-badge {
+    display: none !important; /* On masque le badge technique B2B pour le client final */
+  }
+
+  .play-quiz-btn {
+    padding: 5px 10px !important;
+    font-size: 0.7rem !important;
+    border-radius: 8px !important;
+  }
+
+  .hero-title {
+    font-size: 1.6rem;
+  }
+
+  .news-card-item {
+    grid-template-columns: 80px 1fr;
+    gap: 12px;
+    padding: 0.8rem;
+  }
+
+  .news-card-media {
+    height: 75px;
+    width: 80px;
+  }
+
+  .news-card-emoji {
+    font-size: 1.7rem;
+  }
+
+  .news-card-title {
+    font-size: 0.88rem;
+    -webkit-line-clamp: 2;
+  }
+
+  .news-card-text {
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .news-card-meta {
+    font-size: 0.72rem;
+  }
+
+  /* Optimisation de l'overlay et de la largeur du modal */
+  .news-modal-overlay {
+    padding: 0.4rem !important;
+  }
+
+  .news-modal-content {
+    padding: 1rem !important;
+    max-height: 98vh !important;
+    border-radius: var(--radius-lg);
+  }
+
+  .modal-title {
+    font-size: 1.2rem;
+    margin-bottom: 0.8rem;
+    padding-right: 1.5rem;
+  }
+
+  .modal-banner {
+    height: 120px;
+    margin-bottom: 1rem;
+  }
+
+  .modal-banner-emoji {
+    font-size: 3rem;
+  }
+
+  .modal-body {
+    gap: 1rem;
+  }
+
+  .modal-text {
+    font-size: 0.88rem;
+    line-height: 1.45;
+  }
+
+  .r6g-analysis-box {
+    padding: 0.8rem;
+  }
+
+  .analysis-header {
+    gap: 8px;
+    margin-bottom: 0.6rem;
+  }
+
+  .analysis-logo {
+    font-size: 1.20rem;
+  }
+
+  .analysis-title {
+    font-size: 0.9rem;
+  }
+
+  .analysis-grid {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    padding-bottom: 0.6rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .analysis-metric {
+    padding: 6px 10px;
+    text-align: left;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .metric-label {
+    font-size: 0.62rem;
+  }
+
+  .metric-value {
+    font-size: 0.82rem;
+  }
+
+  .analysis-commentary {
+    font-size: 0.78rem;
+  }
+}
+
+/* Interactive Premium News Modal (Desktop & General) */
 .news-modal-overlay {
   position: fixed;
   inset: 0;
@@ -891,9 +1189,12 @@ body {
 }
 
 .close-modal-btn {
-  position: absolute;
-  top: 1.5rem;
-  right: 1.5rem;
+  position: sticky;
+  top: 0;
+  float: right;
+  z-index: 100;
+  margin-top: -10px;
+  margin-right: -10px;
   background: var(--bg-glass);
   border: 1px solid var(--border-white);
   color: var(--text-secondary);
@@ -906,6 +1207,7 @@ body {
   place-items: center;
   line-height: 1;
   transition: var(--transition-smooth);
+  box-shadow: var(--shadow-sm);
 }
 
 .close-modal-btn:hover {
@@ -1086,18 +1388,4 @@ body {
 @keyframes floatEmoji {
   0% { transform: translateY(0px) rotate(0deg); }
   100% { transform: translateY(-8px) rotate(4deg); }
-}
-
-@media (max-width: 640px) {
-  .news-modal-content {
-    padding: 1.5rem;
-  }
-  
-  .modal-title {
-    font-size: 1.4rem;
-  }
-  
-  .analysis-grid {
-    grid-template-columns: 1fr;
-  }
 }
