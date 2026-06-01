@@ -10,7 +10,7 @@ export default function Home() {
   const [syncSource, setSyncSource] = useState('local_fallback');
   const [activeNewsItem, setActiveNewsItem] = useState(null);
   
-  // Nouveaux états interactifs du plan d'amélioration
+  // Nouveaux états interactifs du plan d'amélioration B2C
   const [votes, setVotes] = useState({});
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState('');
@@ -133,39 +133,39 @@ export default function Home() {
     const vote = votes[item.title];
     if (vote === 'hype') {
       return {
-        hype: '98% (Massif)',
-        potential: 'Critique (Ruée)',
-        target: item.cat === 'collab' ? 'Adultes / Collectionneurs' : 'Fanbase Optimisée'
+        hype: '98% (Légendaire)',
+        potential: 'Impatient (Haut)',
+        target: '100% de Likes'
       };
     } else if (vote === 'flop') {
       return {
-        hype: '42% (Faible)',
-        potential: 'Risqué (Sur-stock)',
-        target: 'Surchargé / Niche'
+        hype: '42% (Moyen)',
+        potential: 'Mitigé',
+        target: 'Avis partagés'
       };
     }
     return {
       hype: item.hot ? '95%' : '84%',
-      potential: 'Très Élevé',
-      target: item.cat === 'collab' ? 'Millennials / Collect' : item.cat === 'manga' ? 'Génération Z' : 'Fanbase Grand Public'
+      potential: item.hot ? 'Légendaire' : 'Énorme',
+      target: item.hot ? 'Hype Générale' : 'Très Attendu'
     };
   }
 
   return (
     <div className="min-h-screen bg-black text-white relative">
       <Head>
-        <title>Road Sixty Geek (QG) — Portail Pop Culture & Licences B2B</title>
-        <meta name="description" content="Toute l'actualité business, analyses de tendances et merchandising des plus grandes licences manga, anime, ciné, séries et collabs de marque." />
+        <title>Road Sixty Geek (QG) — Actu Pop Culture, Mangas & Licences</title>
+        <meta name="description" content="Découvrez toute l'actualité pop culture, mangas, animes, cinéma et les collabs de marque les plus folles !" />
         <link rel="icon" href="/favicon.ico" />
         <link rel="canonical" href="https://roadsixtygeek.com" />
-        <meta property="og:title" content="Road Sixty Geek (QG) — Portail Pop Culture & Licences B2B" />
-        <meta property="og:description" content="L'actualité business et tendances de la pop culture et du merchandising à destination des professionnels et des fans." />
+        <meta property="og:title" content="Road Sixty Geek (QG) — Actu Pop Culture, Mangas & Licences" />
+        <meta property="og:description" content="Le portail ultime des nouveautés pop culture, mangas, animes, séries et drops collectors !" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://roadsixtygeek.com" />
         <meta property="og:image" content="https://roadsixtygeek.com/logo.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Road Sixty Geek (QG) — Portail Pop Culture & Licences B2B" />
-        <meta name="twitter:description" content="L'actualité business et tendances de la pop culture et du merchandising." />
+        <meta name="twitter:title" content="Road Sixty Geek (QG) — Actu Pop Culture, Mangas & Licences" />
+        <meta name="twitter:description" content="Le portail ultime des nouveautés pop culture et drops collectors." />
         <meta name="twitter:image" content="https://roadsixtygeek.com/logo.png" />
         
         {/* Données Structurées JSON-LD pour l'Organisation */}
@@ -179,7 +179,7 @@ export default function Home() {
               "url": "https://roadsixtygeek.com",
               "logo": "https://roadsixtygeek.com/logo.png",
               "sameAs": [
-                "https://www.linkedin.com/company/roadsixtygeek"
+                "https://www.instagram.com/roadsixtygeek"
               ]
             })
           }}
@@ -199,7 +199,7 @@ export default function Home() {
                 "image": activeNewsItem.img || "https://roadsixtygeek.com/logo.png",
                 "author": {
                   "@type": "Organization",
-                  "name": "Road Sixty Geek Intelligence"
+                  "name": "Road Sixty Geek"
                 },
                 "publisher": {
                   "@type": "Organization",
@@ -256,7 +256,7 @@ export default function Home() {
         <p className="hero-subtitle">Veille Pop Culture & Merchandising</p>
         <h1 className="hero-title">Le Portail Officiel des Licences & IP</h1>
         <p className="hero-desc">
-          Analyses de tendances, lancements de produits de marque, sorties anime/manga majeures et buzz des hypermarchés. Le hub d'intelligence Road Sixty Geek.
+          Les dernières tendances pop culture, lancements collectors de marques cultes, sorties manga/anime incontournables et buzz de la communauté. Le hub officiel de Road Sixty Geek.
         </p>
       </section>
 
@@ -403,7 +403,7 @@ export default function Home() {
           <div className="sidebar-widget">
             <h3 className="widget-title">Tendances Licences IP</h3>
             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.2rem', lineHeight: '1.4' }}>
-              Indices de buzz et sell-out mesurés en temps réel sur les réseaux et en points de vente Carrefour/Cora.
+              Les licences les plus recherchées et validées par la communauté en direct des réseaux sociaux.
             </p>
             <div className="trends-list">
               {trends.map((item, idx) => (
@@ -420,68 +420,75 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Widget Newsletter Premium (Plan d'Amélioration Axe 3) */}
-          <div className="sidebar-widget">
-            <h3 className="widget-title">Newsletter Veille Hebdo</h3>
+          {/* Widget Instagram B2C */}
+          <div className="sidebar-widget" style={{ background: 'radial-gradient(circle at 100% 0%, rgba(219, 39, 119, 0.08) 0%, transparent 60%), var(--bg-dark)', borderColor: 'rgba(219, 39, 119, 0.15)' }}>
+            <h3 className="widget-title" style={{ borderBottomColor: 'var(--color-pink)' }}>Rejoignez le Club Instagram !</h3>
             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.2rem', lineHeight: '1.4' }}>
-              Rejoignez plus de 1 200 acheteurs et recevez notre condensé de tendances licences tous les lundis.
+              Suivez-nous sur **@roadsixtygeek** pour les coulisses, les unboxings collectors, les concours exclusifs et votez pour les prochains drops de la boutique !
+            </p>
+            <a 
+              href="https://www.instagram.com/roadsixtygeek" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="play-quiz-btn"
+              style={{ width: '100%', justifyContent: 'center', background: 'linear-gradient(135deg, #c13584 0%, #e1306c 100%)', color: 'white', borderColor: 'transparent', textAlign: 'center' }}
+            >
+              📸 Suivre @roadsixtygeek
+            </a>
+          </div>
+
+          {/* Widget Newsletter B2C */}
+          <div className="sidebar-widget">
+            <h3 className="widget-title">Newsletter Road Sixty Geek</h3>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.2rem', lineHeight: '1.4' }}>
+              Rejoignez notre communauté de passionnés ! Recevez les alertes des meilleurs drops de la semaine, bons plans et actus pop culture incontournables.
             </p>
             {newsletterStatus === 'success' ? (
               <div style={{ background: 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)', padding: '12px', borderRadius: '8px', fontSize: '0.8rem', color: 'var(--color-green)', fontWeight: '600' }}>
-                ✨ Inscription validée ! Bienvenue dans la veille.
+                ✨ Bienvenue dans le Club ! Inscription validée.
               </div>
             ) : (
               <form onSubmit={(e) => { e.preventDefault(); if (newsletterEmail) setNewsletterStatus('success'); }} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <input
                   type="email"
-                  placeholder="Votre email professionnel..."
+                  placeholder="Votre adresse email de passionné..."
                   required
                   value={newsletterEmail}
                   onChange={(e) => setNewsletterEmail(e.target.value)}
                   style={{ background: 'var(--bg-glass)', border: '1px solid var(--border-white)', padding: '10px', borderRadius: '8px', fontSize: '0.8rem', color: 'var(--text-primary)', outline: 'none' }}
                 />
                 <button type="submit" className="play-quiz-btn" style={{ justifyContent: 'center', fontSize: '0.8rem', padding: '10px' }}>
-                  S'abonner à la veille B2B
+                  S'inscrire au Club Geek
                 </button>
               </form>
             )}
           </div>
 
-          {/* Widget de Feedback / Axes d'amélioration (Plan d'Amélioration Protocole) */}
+          {/* Widget de Feedback B2C (Boîte à Idées) */}
           <div className="sidebar-widget">
-            <h3 className="widget-title">Avis & Axes d'Amélioration</h3>
+            <h3 className="widget-title">Votre Boîte à Idées !</h3>
             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.2rem', lineHeight: '1.4' }}>
-              Dites-nous ce qui vous plaît ou ce qui vous manque sur le QG !
+              Une idée de drop, de collab de vos rêves ou de sujet d'actualité ? Partagez vos suggestions avec l'équipe Road Sixty Geek !
             </p>
             {feedbackStatus === 'success' ? (
               <div style={{ background: 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)', padding: '12px', borderRadius: '8px', fontSize: '0.8rem', color: 'var(--color-green)', fontWeight: '600' }}>
-                🙏 Merci ! Notre équipe analyse votre retour.
+                🙏 Merci ! Votre idée a bien été envoyée à l'équipe.
               </div>
             ) : (
               <form onSubmit={(e) => { e.preventDefault(); if (feedbackText) setFeedbackStatus('success'); }} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <textarea
-                  placeholder="Fonctionnalités, données, ou actus manquantes..."
+                  placeholder="Quelle collab ou drop aimeriez-vous voir..."
                   required
                   rows="3"
                   value={feedbackText}
                   onChange={(e) => setFeedbackText(e.target.value)}
                   style={{ background: 'var(--bg-glass)', border: '1px solid var(--border-white)', padding: '10px', borderRadius: '8px', fontSize: '0.8rem', color: 'var(--text-primary)', outline: 'none', fontFamily: 'inherit', resize: 'vertical' }}
                 />
-                <button type="submit" className="play-quiz-btn" style={{ background: 'var(--color-dark)', color: 'var(--color-yellow)', justifyContent: 'center', fontSize: '0.8rem', padding: '10px' }}>
-                  Envoyer mon avis
+                <button type="submit" className="play-quiz-btn" style={{ background: 'var(--bg-dark)', color: 'var(--color-yellow)', justifyContent: 'center', fontSize: '0.8rem', padding: '10px' }}>
+                  Envoyer mon idée
                 </button>
               </form>
             )}
-          </div>
-
-          {/* Widget d'info de synchronisation (Preuve de cron) */}
-          <div className="sidebar-widget" style={{ padding: '1.2rem' }}>
-            <h4 style={{ fontSize: '0.9rem', fontWeight: '700', marginBottom: '8px', fontFamily: 'var(--font-head)' }}>Statut de Synchronisation</h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
-              <div>• Tâche Cron : <span style={{ color: 'var(--color-green)', fontWeight: '600' }}>Active (1h)</span></div>
-              <div>• Source locale : <span style={{ fontFamily: 'monospace' }}>Downloads/_qg_payload_*.json</span></div>
-              <div>• Qualité éditoriale : <span style={{ color: 'var(--color-cyan)', fontWeight: '600' }}>Norme LinkedIn</span></div>
-            </div>
           </div>
 
         </aside>
@@ -524,22 +531,22 @@ export default function Home() {
               <h4 className="modal-section-title">Actualité Pop Culture & Licences</h4>
               <p className="modal-text">{activeNewsItem.text}</p>
               
-              {/* Vote interactif B2B (Plan d'Amélioration Axe 3) */}
+              {/* Vote interactif B2C */}
               <div style={{ background: 'var(--bg-glass)', border: '1px solid var(--border-white)', padding: '15px', borderRadius: '12px', marginTop: '8px' }}>
-                <h4 style={{ fontSize: '0.9rem', fontWeight: '800', fontFamily: 'var(--font-head)', color: 'var(--color-dark)', marginBottom: '4px' }}>Sentiment Décideur / Évaluation de Potentiel</h4>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '12px' }}>Votre avis pro sur le potentiel de cette licence dans vos points de vente.</p>
+                <h4 style={{ fontSize: '0.9rem', fontWeight: '800', fontFamily: 'var(--font-head)', color: 'var(--color-dark)', marginBottom: '4px' }}>Votre avis de passionné</h4>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '12px' }}>Dites-nous : allez-vous craquer pour cette nouveauté ?</p>
                 {votes[activeNewsItem.title] ? (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(234, 179, 8, 0.05)', border: '1px solid rgba(234, 179, 8, 0.2)', padding: '8px 12px', borderRadius: '8px', fontSize: '0.8rem', color: '#b28b03', fontWeight: '600' }}>
-                    <span>👍 Sentiment enregistré : {votes[activeNewsItem.title] === 'hype' ? 'Hype Massive' : 'Risque de Flop'} !</span>
+                    <span>{votes[activeNewsItem.title] === 'hype' ? '🔥 Direct dans ma collection !' : '💸 Je passe mon tour'}</span>
                     <button onClick={() => setVotes(prev => ({ ...prev, [activeNewsItem.title]: null }))} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', textDecoration: 'underline', fontSize: '0.75rem', cursor: 'pointer' }}>Modifier</button>
                   </div>
                 ) : (
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <button onClick={() => setVotes(prev => ({ ...prev, [activeNewsItem.title]: 'hype' }))} style={{ flex: 1, border: '1px solid var(--border-white)', background: 'var(--bg-dark)', padding: '8px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', transition: 'var(--transition-smooth)' }}>
-                      🔥 Hype Massive
+                      🔥 Direct dans ma collection
                     </button>
                     <button onClick={() => setVotes(prev => ({ ...prev, [activeNewsItem.title]: 'flop' }))} style={{ flex: 1, border: '1px solid var(--border-white)', background: 'var(--bg-dark)', padding: '8px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', transition: 'var(--transition-smooth)' }}>
-                      ⚠️ Risque Flop
+                      💸 Je passe mon tour
                     </button>
                   </div>
                 )}
@@ -550,8 +557,8 @@ export default function Home() {
                 <div className="analysis-header">
                   <span className="analysis-logo">🛡️</span>
                   <div>
-                    <h4 className="analysis-title">R6G Licensing Intelligence</h4>
-                    <p className="analysis-subtitle">Analyse d'impact retail & tendances B2B</p>
+                    <h4 className="analysis-title">L'Avis Pop Culture du QG</h4>
+                    <p className="analysis-subtitle">Analyses de fans & insights passion</p>
                   </div>
                 </div>
                 <div className="analysis-grid">
@@ -562,20 +569,20 @@ export default function Home() {
                     </span>
                   </div>
                   <div className="analysis-metric">
-                    <span className="metric-label">Potentiel Commercial</span>
+                    <span className="metric-label">Niveau d'Attente</span>
                     <span className="metric-value text-green">
                       {getDynamicMetrics(activeNewsItem).potential}
                     </span>
                   </div>
                   <div className="analysis-metric">
-                    <span className="metric-label">Cible Consommateurs</span>
+                    <span className="metric-label">Hype Instagram</span>
                     <span className="metric-value" style={{ fontSize: '0.8rem' }}>
                       {getDynamicMetrics(activeNewsItem).target}
                     </span>
                   </div>
                 </div>
                 <div className="analysis-commentary">
-                  <strong>Décryptage de l'Expert R6G :</strong> Cette annonce confirme la vigueur insolente du segment de licence auprès des consommateurs européens. Le sell-out constaté en hypermarchés (notamment dans les corners Carrefour et Cora) démontre que les lancements de produits dérivés d'anime et de collabs de marque captent l'attention immédiate. Nous conseillons aux chefs de rayon d'accentuer la théâtralisation en magasin pour maximiser le chiffre d'affaires impulsif.
+                  <strong>Le mot de la Rédac :</strong> Cette annonce fait déjà vibrer toute la communauté geek sur les réseaux ! L'engouement constaté notamment sur notre compte Instagram montre que les passionnés attendent ce drop au tournant. Préparez-vous et restez à l'affût, les stocks risquent de s'écouler à vitesse grand V dès la sortie officielle !
                 </div>
               </div>
             </div>
