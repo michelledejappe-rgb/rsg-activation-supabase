@@ -167,7 +167,7 @@ export default function Home() {
 
       {/* Hero Header d'Introduction */}
       <section className="qg-hero-header">
-        <p className="hero-subtitle">Veuve Pop Culture & Merchandising</p>
+        <p className="hero-subtitle">Veille Pop Culture & Merchandising</p>
         <h1 className="hero-title">Le Portail Officiel des Licences & IP</h1>
         <p className="hero-desc">
           Analyses de tendances, lancements de produits de marque, sorties anime/manga majeures et buzz des hypermarchés. Le hub d'intelligence Road Sixty Geek.
