@@ -125,30 +125,30 @@ export default function Home() {
       }
     }
 
-    // 1. Dessiner le Logo Officiel de Road Sixty Geek en haut
+    // 1. Dessiner le Logo Officiel de Road Sixty Geek à un emplacement stratégique (abaissé à y=130 avec plus de liberté verticale)
     if (logoImg) {
-      const logoW = 340;
+      const logoW = 280; // Légèrement plus élégant et raffiné
       const logoH = logoImg.height * (logoW / logoImg.width);
-      ctx.drawImage(logoImg, 540 - logoW / 2, 70, logoW, logoH);
+      ctx.drawImage(logoImg, 540 - logoW / 2, 130, logoW, logoH);
     } else {
       ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 36px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('ROAD SIXTY GEEK', 540, 100);
+      ctx.fillText('ROAD SIXTY GEEK', 540, 160);
     }
 
-    // 2. Dessiner le Visuel Central (Grand rectangle aux bords arrondis)
+    // 2. Dessiner le Visuel Central (Grand rectangle aux bords arrondis - Abaissé à y=310 pour laisser respirer le logo)
     const imgX = 80;
-    const imgY = 220;
+    const imgY = 310;
     const imgW = 920;
-    const imgH = 920; // Carré parfait à fort impact visuel
+    const imgH = 880; // Format poster d'impact
     const imgRadius = 24;
     
     ctx.save();
     // Ombre portée sous le visuel
     ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
-    ctx.shadowBlur = 40;
-    ctx.shadowOffsetY = 15;
+    ctx.shadowBlur = 45;
+    ctx.shadowOffsetY = 18;
     ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
     drawRoundedRect(ctx, imgX, imgY, imgW, imgH, imgRadius);
     ctx.fill();
@@ -188,15 +188,15 @@ export default function Home() {
     }
     ctx.restore();
 
-    // 3. Dessiner la carte de contenu (Glassmorphism moderne)
+    // 3. Dessiner la carte de contenu (Positionnée à y=1240)
     const cardX = 80;
-    const cardY = 1190;
+    const cardY = 1240;
     const cardW = 920;
-    const cardH = 480;
+    const cardH = 430;
     const cardRadius = 24;
 
     ctx.save();
-    ctx.fillStyle = 'rgba(15, 23, 42, 0.78)'; // Deep slate-900 transparent
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.82)'; // Slate-900 transparent d'une grande profondeur
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
     ctx.lineWidth = 2;
     drawRoundedRect(ctx, cardX, cardY, cardW, cardH, cardRadius);
@@ -204,33 +204,37 @@ export default function Home() {
     ctx.stroke();
     ctx.restore();
 
-    // 4. Catégorie et Date
+    // Ligne néon verticale de design à gauche du texte
+    ctx.fillStyle = '#eab308';
+    ctx.fillRect(cardX + 35, cardY + 40, 6, cardH - 80);
+
+    // 4. Catégorie et Date (Décalés à droite de la règle verticale)
     const catLabel = CATEGORIES[activeNewsItem.cat]?.label.toUpperCase() || 'ACTU';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
     ctx.fillStyle = '#eab308'; // Jaune emblématique
     ctx.font = '900 24px sans-serif';
-    ctx.fillText(catLabel, cardX + 40, cardY + 40);
+    ctx.fillText(catLabel, cardX + 60, cardY + 40);
 
     const dateStr = getDisplayTime(activeNewsItem).toUpperCase();
     ctx.fillStyle = '#94a3b8'; // slate-400
     ctx.font = '700 22px sans-serif';
     const catWidth = ctx.measureText(catLabel).width;
-    ctx.fillText(`  •  ${dateStr}`, cardX + 40 + catWidth, cardY + 40);
+    ctx.fillText(`  •  ${dateStr}`, cardX + 60 + catWidth, cardY + 40);
 
-    // 5. Titre de l'article (Massif, gras, lisible)
+    // 5. Titre de l'article (Décalé à droite de la règle verticale)
     ctx.fillStyle = '#ffffff';
     ctx.font = '900 42px sans-serif';
-    const maxTitleWidth = cardW - 80;
+    const maxTitleWidth = cardW - 120;
     let startY = cardY + 95;
     
     const titleLines = wrapText(ctx, activeNewsItem.title, maxTitleWidth);
     titleLines.slice(0, 3).forEach((line) => {
-      ctx.fillText(line, cardX + 40, startY);
+      ctx.fillText(line, cardX + 60, startY);
       startY += 54;
     });
 
-    // 6. Excerpt / Description
+    // 6. Excerpt / Description (Décalé à droite de la règle verticale)
     ctx.fillStyle = '#cbd5e1'; // slate-300
     ctx.font = '500 24px sans-serif';
     startY += 15;
@@ -238,11 +242,11 @@ export default function Home() {
     const cleanDesc = activeNewsItem.text.split('. ')[0] + '.';
     const descLines = wrapText(ctx, cleanDesc, maxTitleWidth);
     descLines.slice(0, 3).forEach(line => {
-      ctx.fillText(line, cardX + 40, startY);
+      ctx.fillText(line, cardX + 60, startY);
       startY += 36;
     });
 
-    // 7. Dessiner le Sticker Hype Diagonal (Superposé élégamment)
+    // 7. Dessiner le Sticker Hype Diagonal (Superposé élégamment, tourné légèrement pour un rendu streetwear spontané)
     const STICKERS = {
       hype: { label: '🔥 HYPE MAXIMALE', color: '#eab308', textColor: '#000000' },
       drop: { label: '🚨 ALERTE DROP', color: '#ef4444', textColor: '#ffffff' },
@@ -274,27 +278,7 @@ export default function Home() {
     ctx.fillText(sticker.label, 0, 0);
     ctx.restore();
 
-    // 8. Footer Link
-    const footerY = 1770;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    
-    ctx.save();
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-    ctx.shadowBlur = 10;
-    ctx.shadowOffsetY = 4;
-
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
-    ctx.lineWidth = 1.5;
-    drawRoundedRect(ctx, 540 - 200, footerY - 40, 400, 80, 40);
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
-    
-    ctx.fillStyle = '#ffffff';
-    ctx.font = '900 24px sans-serif';
-    ctx.fillText('🔗 roadsixtygeek.com', 540, footerY);
+    // 8. Footer Link supprimé au profit d'un minimalisme total (Plus de mention roadsixtygeek.com, laisse la place à la mention Instagram native de l'utilisateur)
 
     try {
       const url = canvas.toDataURL('image/png');
