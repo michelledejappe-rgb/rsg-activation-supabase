@@ -7,36 +7,38 @@
   --font-body: 'Plus Jakarta Sans', sans-serif;
 
   /* Palette de couleurs Jaune & Noir (Road Sixty Geek Shield Theme) */
-  --bg-abyss: #f8fafc;          /* Fond principal blanc cassé propre */
+  --bg-abyss: #f1f5f9;          /* Gris-blanc ardoise clair */
   --bg-dark: #ffffff;           /* Fond blanc pur pour les cartes et en-tête */
-  --bg-card: rgba(255, 255, 255, 0.9);
-  --bg-glass: rgba(241, 245, 249, 0.7);
-  --border-white: rgba(15, 23, 42, 0.06); /* Bordures discrètes */
-  --border-glow: rgba(234, 179, 8, 0.35);  /* Lueur jaune survol */
+  --bg-card: rgba(255, 255, 255, 0.95);
+  --bg-glass: rgba(241, 245, 249, 0.85);
+  --border-white: #e2e8f0;      /* Bordure solide grise très fine et nette */
+  --border-glow: rgba(234, 179, 8, 0.5);   /* Lueur jaune survol */
 
   --color-yellow: #eab308;          /* Jaune officiel Road Sixty Geek */
   --color-yellow-glow: rgba(234, 179, 8, 0.15);
   --color-dark: #0f172a;            /* Noir asphalte officiel */
-  --color-dark-glow: rgba(15, 23, 42, 0.1);
+  --color-dark-glow: rgba(15, 23, 42, 0.08);
   --color-green: #10b981;
-  --color-green-glow: rgba(16, 185, 129, 0.15);
+  --color-green-glow: rgba(16, 185, 129, 0.1);
 
-  /* Couleurs secondaires pour le flux d'actus */
+  /* Couleurs secondaires pour les catégories */
   --color-purple: #7c3aed;
-  --color-cyan: #06b6d4;
-  --color-orange: #f97316;
-  --color-pink: #ec4899;
+  --color-cyan: #0891b2;
+  --color-orange: #ea580c;
+  --color-pink: #db2777;
 
   --text-primary: #0f172a;          /* Texte principal noir pour fond clair */
   --text-secondary: #475569;        /* Slate gray pour la lecture */
-  --text-muted: #64748b;            /* Muted text */
+  --text-muted: #64748b;            /* Texte estompé */
 
-  --transition-smooth: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
-  --radius-xl: 18px;
+  --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --radius-xl: 16px;
   --radius-lg: 12px;
-  --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
-  --shadow-md: 0 10px 30px rgba(15, 23, 42, 0.06);
-  --shadow-lg: 0 20px 40px rgba(15, 23, 42, 0.09);
+  
+  /* Ombres portées ultra-douces et réalistes */
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.03), 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.05), 0 2px 4px -1px rgba(15, 23, 42, 0.03);
+  --shadow-lg: 0 10px 25px -3px rgba(15, 23, 42, 0.05), 0 4px 6px -2px rgba(15, 23, 42, 0.02);
 }
 
 /* Reset de base & Structure */
@@ -48,6 +50,9 @@
 
 body {
   background-color: var(--bg-abyss);
+  /* Trame de fond style dot-grid (signature Vercel/Stripe) ultra-premium */
+  background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+  background-size: 24px 24px;
   color: var(--text-primary);
   font-family: var(--font-body);
   overflow-x: hidden;
@@ -73,9 +78,9 @@ body {
   width: 500px;
   height: 500px;
   border-radius: 50%;
-  background: radial-gradient(circle, var(--color-yellow-glow) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--color-yellow-glow) 0%, transparent 75%);
   filter: blur(80px);
-  opacity: 0.5;
+  opacity: 0.6;
 }
 
 .glow-2 {
@@ -85,32 +90,20 @@ body {
   width: 600px;
   height: 600px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(6, 182, 212, 0.05) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(8, 145, 178, 0.03) 0%, transparent 75%);
   filter: blur(100px);
-  opacity: 0.4;
+  opacity: 0.5;
 }
 
-.glow-3 {
-  position: absolute;
-  top: 600px;
-  left: 30%;
-  width: 450px;
-  height: 450px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(249, 115, 22, 0.04) 0%, transparent 70%);
-  filter: blur(80px);
-  opacity: 0.3;
-}
-
-/* Header Premium Blanc Pur */
+/* Header Premium Blanc Pur Élevé */
 .qg-header {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border-white);
-  padding: 1.1rem 2rem;
+  padding: 1rem 2rem;
   box-shadow: var(--shadow-sm);
   transition: var(--transition-smooth);
 }
@@ -130,16 +123,23 @@ body {
   text-decoration: none;
 }
 
+.logo-img {
+  height: 38px;
+  width: auto;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
 .logo-text {
   font-family: var(--font-head);
   font-weight: 800;
-  font-size: 1.4rem;
-  letter-spacing: 0.5px;
+  font-size: 1.35rem;
+  letter-spacing: 0.25px;
   color: var(--color-dark);
 }
 
 .logo-tag {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
   padding: 2px 10px;
   border-radius: 12px;
@@ -170,8 +170,8 @@ body {
 }
 
 .sync-badge.fallback {
-  background: rgba(249, 115, 22, 0.06);
-  border: 1px solid rgba(249, 115, 22, 0.15);
+  background: rgba(234, 88, 12, 0.06);
+  border: 1px solid rgba(234, 88, 12, 0.15);
   color: var(--color-orange);
 }
 
@@ -200,27 +200,26 @@ body {
   gap: 8px;
   padding: 8px 18px;
   border-radius: var(--radius-lg);
-  background: linear-gradient(135deg, var(--color-dark) 0%, #2a3347 100%);
+  background: linear-gradient(135deg, var(--color-dark) 0%, #1e293b 100%);
   color: var(--color-yellow); /* Bouton noir avec lueur jaune */
   text-decoration: none;
   font-weight: 700;
   font-size: 0.85rem;
-  box-shadow: 0 4px 15px rgba(15, 23, 42, 0.15);
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.1);
   border: 1px solid var(--color-dark);
   cursor: pointer;
   transition: var(--transition-smooth);
 }
 
 .play-quiz-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.25);
-  background: var(--color-dark);
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 15px rgba(15, 23, 42, 0.2);
 }
 
 /* Zone d'introduction (Hero Header) */
 .qg-hero-header {
   max-width: 1300px;
-  margin: 3.5rem auto 2rem auto;
+  margin: 3.5rem auto 2.2rem auto;
   padding: 0 2rem;
   text-align: center;
 }
@@ -230,7 +229,7 @@ body {
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 2px;
-  color: var(--color-yellow);
+  color: #c29d0b;
   margin-bottom: 0.5rem;
 }
 
@@ -247,14 +246,14 @@ body {
   max-width: 720px;
   margin: 0 auto;
   color: var(--text-secondary);
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   line-height: 1.6;
 }
 
-/* Grille Mosaïque "A la Une" (Jeuxvideo.com Style - Version Claire) */
+/* Grille Mosaïque "A la Une" (Jeuxvideo.com Style) */
 .qg-mosaic-section {
   max-width: 1300px;
-  margin: 0 auto 3.5rem auto;
+  margin: 0 auto 3rem auto;
   padding: 0 2rem;
 }
 
@@ -262,7 +261,6 @@ body {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 20px;
-  min-height: 480px;
 }
 
 /* Card Principal "A la Une" (Grande case gauche) */
@@ -272,12 +270,13 @@ body {
   overflow: hidden;
   border: 1px solid var(--border-white);
   box-shadow: var(--shadow-lg);
-  background: #0f172a; /* Garder un fond sombre uniquement pour les articles à la une afin de faire ressortir les images */
+  background: #0f172a; /* Fond noir pour les photos */
   cursor: pointer;
   transition: var(--transition-smooth);
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  min-height: 480px;
 }
 
 /* Image de background avec fallback en dégradé */
@@ -324,18 +323,17 @@ body {
   gap: 6px;
   padding: 4px 10px;
   border-radius: 6px;
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-size: 0.72rem;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-/* Catégories couleurs spécifiques (Visuels clairs haut de gamme) */
-.cat-cine { background-color: rgba(249, 115, 22, 0.1); border: 1px solid var(--color-orange); color: var(--color-orange); }
+.cat-cine { background-color: rgba(234, 88, 12, 0.1); border: 1px solid var(--color-orange); color: var(--color-orange); }
 .cat-series { background-color: rgba(124, 58, 237, 0.1); border: 1px solid var(--color-purple); color: var(--color-purple); }
-.cat-anime { background-color: rgba(6, 182, 212, 0.1); border: 1px solid var(--color-cyan); color: var(--color-cyan); }
-.cat-manga { background-color: rgba(234, 179, 8, 0.1); border: 1px solid #c29d0b; color: #a17c06; }
-.cat-collab { background-color: rgba(236, 72, 153, 0.1); border: 1px solid var(--color-pink); color: var(--color-pink); }
+.cat-anime { background-color: rgba(8, 145, 178, 0.1); border: 1px solid var(--color-cyan); color: var(--color-cyan); }
+.cat-manga { background-color: rgba(234, 179, 8, 0.12); border: 1px solid #d9a706; color: #a17c06; }
+.cat-collab { background-color: rgba(219, 39, 119, 0.1); border: 1px solid var(--color-pink); color: var(--color-pink); }
 
 .hot-badge {
   display: inline-flex;
@@ -343,8 +341,8 @@ body {
   gap: 4px;
   padding: 4px 10px;
   border-radius: 6px;
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-size: 0.72rem;
+  font-weight: 800;
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid #ef4444;
   color: #ef4444;
@@ -358,31 +356,26 @@ body {
   gap: 4px;
   padding: 4px 10px;
   border-radius: 6px;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 800;
-  background: rgba(234, 179, 8, 0.15);
+  background: rgba(234, 179, 8, 0.18);
   border: 1px solid var(--color-yellow);
-  color: #a17c06;
+  color: #b28b03;
   text-transform: uppercase;
-}
-
-@keyframes pulse-glow {
-  0% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.2); }
-  100% { box-shadow: 0 0 12px rgba(239, 68, 68, 0.5); }
 }
 
 .mosaic-title {
   font-family: var(--font-head);
-  font-size: 2.2rem;
+  font-size: 2.1rem;
   font-weight: 700;
   line-height: 1.25;
   color: white;
 }
 
 .mosaic-text {
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.8);
   font-size: 0.95rem;
-  line-height: 1.5;
+  line-height: 1.55;
   max-width: 90%;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -392,20 +385,19 @@ body {
 
 .mosaic-date {
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.55);
   font-weight: 500;
 }
 
 /* Pile de droite (Mosaïque secondaire) */
 .hero-side-stack {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: repeat(3, 1fr);
   gap: 15px;
 }
 
 .mosaic-side-card {
   position: relative;
-  flex: 1;
   border-radius: var(--radius-lg);
   overflow: hidden;
   border: 1px solid var(--border-white);
@@ -417,6 +409,7 @@ body {
   flex-direction: column;
   justify-content: flex-end;
   padding: 1.2rem;
+  min-height: 150px;
 }
 
 .mosaic-side-card:hover {
@@ -441,7 +434,7 @@ body {
 .side-card-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.3) 70%, transparent 100%);
+  background: linear-gradient(to top, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.35) 70%, transparent 100%);
   z-index: 2;
 }
 
@@ -455,8 +448,8 @@ body {
 
 .side-card-title {
   font-family: var(--font-head);
-  font-size: 1.15rem;
-  font-weight: 600;
+  font-size: 1.1rem;
+  font-weight: 700;
   line-height: 1.3;
   color: white;
   display: -webkit-box;
@@ -516,7 +509,7 @@ body {
   background: var(--color-dark);
   border-color: var(--color-dark);
   color: var(--color-yellow); /* Actif en jaune sur noir */
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+  box-shadow: var(--shadow-md);
 }
 
 /* Barre de recherche interactive */
@@ -649,7 +642,7 @@ body {
 }
 
 .news-card-item:hover .news-card-title {
-  color: #c29d0b;
+  color: #b28b03;
 }
 
 .news-card-text {
@@ -667,7 +660,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: var(--text-muted);
 }
 
@@ -730,7 +723,7 @@ body {
 }
 
 .trend-percentage {
-  color: #c29d0b;
+  color: #b28b03;
 }
 
 .trend-bar-bg {
@@ -796,6 +789,7 @@ body {
   border: 1px solid var(--border-white);
   border-radius: var(--radius-lg);
   padding: 1.2rem;
+  box-shadow: var(--shadow-sm);
 }
 
 /* Footer Premium en Gris Clair */
@@ -812,7 +806,7 @@ body {
 .footer-logo {
   font-family: var(--font-head);
   font-weight: 800;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   color: var(--color-dark);
   margin-bottom: 0.5rem;
   letter-spacing: 0.5px;
