@@ -1056,28 +1056,29 @@ body {
   }
 
   .news-card-item {
-    grid-template-columns: 80px minmax(0, 1fr);
-    gap: 12px;
-    padding: 0.8rem;
+    grid-template-columns: 100px minmax(0, 1fr) !important;
+    gap: 16px !important;
+    padding: 1.1rem !important;
   }
 
   .news-card-media {
-    height: 75px;
-    width: 80px;
+    height: 95px !important;
+    width: 100px !important;
   }
 
   .news-card-emoji {
-    font-size: 1.7rem;
+    font-size: 2.2rem !important;
   }
 
   .news-card-title {
-    font-size: 0.88rem;
-    -webkit-line-clamp: 2;
+    font-size: 1.05rem !important;
+    line-height: 1.35 !important;
   }
 
   .news-card-text {
-    font-size: 0.75rem;
-    line-height: 1.4;
+    font-size: 0.82rem !important;
+    line-height: 1.45 !important;
+    margin-top: 4px !important;
   }
 
   .news-card-meta {
