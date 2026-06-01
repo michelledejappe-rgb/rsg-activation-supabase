@@ -255,6 +255,7 @@ body {
   max-width: 1300px;
   margin: 0 auto 3rem auto;
   padding: 0 2rem;
+  overflow: hidden; /* Prévient tout débordement de page */
 }
 
 .mosaic-grid {
@@ -569,7 +570,7 @@ body {
 /* Carte d'actualité individuelle (Fond Blanc Élevé) */
 .news-card-item {
   display: grid;
-  grid-template-columns: 180px 1fr;
+  grid-template-columns: 180px minmax(0, 1fr);
   gap: 20px;
   background: var(--bg-dark);
   border: 1px solid var(--border-white);
@@ -623,6 +624,7 @@ body {
   flex-direction: column;
   gap: 8px;
   justify-content: center;
+  min-width: 0; /* Empêche l'élargissement de la colonne de texte en flex/grid */
 }
 
 .news-card-title-row {
@@ -639,6 +641,9 @@ body {
   line-height: 1.35;
   color: var(--color-dark);
   transition: var(--transition-smooth);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .news-card-item:hover .news-card-title {
@@ -974,7 +979,7 @@ body {
   }
 
   .news-card-item {
-    grid-template-columns: 100px 1fr;
+    grid-template-columns: 100px minmax(0, 1fr);
     gap: 12px;
     padding: 0.9rem;
   }
@@ -1051,7 +1056,7 @@ body {
   }
 
   .news-card-item {
-    grid-template-columns: 80px 1fr;
+    grid-template-columns: 80px minmax(0, 1fr);
     gap: 12px;
     padding: 0.8rem;
   }
