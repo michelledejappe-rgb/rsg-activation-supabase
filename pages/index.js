@@ -1061,57 +1061,56 @@ export default function Home() {
                 marginTop: '60px',
                 width: '920px',
                 minHeight: '430px',
-                background: 'rgba(15, 23, 42, 0.85)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
+                background: 'rgba(10, 15, 30, 0.92)', // Arrière-plan plus sombre et contrasté pour une lisibilité parfaite
+                border: '1px solid rgba(255, 255, 255, 0.12)', // Bordure blanche néon fine et nette
                 borderRadius: '24px',
                 boxSizing: 'border-box',
                 padding: '50px 50px 50px 80px',
                 position: 'relative',
                 zIndex: 10,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'flex-start'
+                display: 'block' // Passage en display block standard pour contourner les bugs de flexbox SVG sous Safari iOS
               }}
             >
-              {/* Règle verticale néon */}
+              {/* Règle verticale néon jaune */}
               <div style={{ position: 'absolute', left: '35px', top: '50px', bottom: '50px', width: '6px', background: '#eab308', borderRadius: '4px' }} />
 
               {/* Catégorie et Date */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '15px' }}>
-                <span style={{ fontSize: '24px', fontWeight: 900, color: '#eab308', letterSpacing: '1.5px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '22px' }}>
+                <span style={{ fontSize: '24px', fontWeight: 900, color: '#eab308', letterSpacing: '1.5px', fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif' }}>
                   {CATEGORIES[activeNewsItem?.cat]?.label?.toUpperCase() || 'ACTU'}
                 </span>
-                <span style={{ fontSize: '22px', fontWeight: 700, color: '#94a3b8' }}>
+                <span style={{ fontSize: '22px', fontWeight: 700, color: '#94a3b8', fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif' }}>
                   • {activeNewsItem ? getDisplayTime(activeNewsItem).toUpperCase() : ''}
                 </span>
               </div>
 
-              {/* Titre Impact condensé en Bebas Neue */}
+              {/* Titre Impact / Arial Black — Style Streetwear Editorial Ultra-condensé */}
               <h2 
                 style={{ 
                   fontSize: '54px', 
                   fontWeight: 900, 
                   color: '#ffffff', 
-                  margin: 0, 
+                  margin: '0 0 24px 0', 
                   padding: 0, 
-                  lineHeight: '58px',
+                  lineHeight: '62px', // Espacement de ligne généreux et protecteur pour éviter toute superposition
                   letterSpacing: '0.5px',
-                  fontFamily: 'Bebas Neue, sans-serif'
+                  fontFamily: '"Impact", "Arial Black", sans-serif', // Fontes streetwear robustes préinstallées sur iOS et Android
+                  textTransform: 'uppercase' // Force la DA streetwear prestigieuse
                 }}
               >
                 {activeNewsItem?.title}
               </h2>
 
-              {/* Excerpt en Montserrat */}
+              {/* Excerpt en Helvetica Neue épuré */}
               <p 
                 style={{ 
-                  fontSize: '25px', 
+                  fontSize: '26px', 
                   fontWeight: 500, 
                   color: '#cbd5e1', 
-                  margin: '18px 0 0 0', 
+                  margin: 0, 
                   padding: 0, 
-                  lineHeight: '36px',
-                  fontFamily: 'Montserrat, sans-serif'
+                  lineHeight: '38px',
+                  fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif' // Standardisé pour la netteté du rendu de petits textes
                 }}
               >
                 {activeNewsItem?.text?.split('. ')[0] || ''}.
