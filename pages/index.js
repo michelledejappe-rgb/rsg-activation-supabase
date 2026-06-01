@@ -125,23 +125,23 @@ export default function Home() {
       }
     }
 
-    // 1. Dessiner le Logo Officiel de Road Sixty Geek à un emplacement stratégique (abaissé à y=130 avec plus de liberté verticale)
+    // 1. Dessiner le Logo Officiel de Road Sixty Geek à un emplacement stratégique hors de la zone de sécurité d'Instagram (y=210)
     if (logoImg) {
-      const logoW = 280; // Légèrement plus élégant et raffiné
+      const logoW = 300; // Légèrement plus élégant et raffiné
       const logoH = logoImg.height * (logoW / logoImg.width);
-      ctx.drawImage(logoImg, 540 - logoW / 2, 130, logoW, logoH);
+      ctx.drawImage(logoImg, 540 - logoW / 2, 210, logoW, logoH);
     } else {
       ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 36px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('ROAD SIXTY GEEK', 540, 160);
+      ctx.fillText('ROAD SIXTY GEEK', 540, 240);
     }
 
-    // 2. Dessiner le Visuel Central (Grand rectangle aux bords arrondis - Abaissé à y=310 pour laisser respirer le logo)
+    // 2. Dessiner le Visuel Central (Abaissé à y=400 pour laisser respirer le logo et éviter les masquages du notch/menu d'Instagram)
     const imgX = 80;
-    const imgY = 310;
+    const imgY = 400;
     const imgW = 920;
-    const imgH = 880; // Format poster d'impact
+    const imgH = 780; // Format poster horizontal d'un grand équilibre de composition
     const imgRadius = 24;
     
     ctx.save();
@@ -173,30 +173,94 @@ export default function Home() {
       }
       ctx.drawImage(mainImg, srcX, srcY, srcW, srcH, imgX, imgY, imgW, imgH);
     } else {
-      // Fallback dégradé néon + émoji si l'image ne charge pas
-      const neonGrad = ctx.createLinearGradient(imgX, imgY, imgX, imgY + imgH);
-      neonGrad.addColorStop(0, '#eab308');
-      neonGrad.addColorStop(1, '#db2777');
-      ctx.fillStyle = neonGrad;
+      // CONCEPTION GRAPHIQUE COMPLÈTE - FALLBACK "PICTO-ONLY" PRESTIGE (STYLE DA STREETWEAR & TECH ACCENTS)
+      const grad = ctx.createLinearGradient(imgX, imgY, imgX, imgY + imgH);
+      grad.addColorStop(0, '#1e1b4b'); // Indigo profond
+      grad.addColorStop(1, '#090d16');
+      ctx.fillStyle = grad;
       ctx.fillRect(imgX, imgY, imgW, imgH);
-      
-      ctx.font = '160px sans-serif';
+
+      // Grille Dot-Matrix subtile
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+      for (let gx = imgX + 35; gx < imgX + imgW; gx += 35) {
+        for (let gy = imgY + 35; gy < imgY + imgH; gy += 35) {
+          ctx.beginPath();
+          ctx.arc(gx, gy, 1.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      // Lignes de construction néon croisées en arrière-plan
+      ctx.strokeStyle = 'rgba(234, 179, 8, 0.12)'; // Jaune
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(imgX + 80, imgY + 80);
+      ctx.lineTo(imgX + imgW - 80, imgY + imgH - 80);
+      ctx.stroke();
+
+      ctx.strokeStyle = 'rgba(219, 39, 119, 0.12)'; // Rose
+      ctx.beginPath();
+      ctx.moveTo(imgX + imgW - 80, imgY + 80);
+      ctx.lineTo(imgX + 80, imgY + imgH - 80);
+      ctx.stroke();
+
+      // Émoji en filigrane géant à très faible opacité
+      ctx.save();
+      ctx.globalAlpha = 0.05;
+      ctx.font = '360px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = '#ffffff';
       ctx.fillText(activeNewsItem.emoji || '📰', imgX + imgW / 2, imgY + imgH / 2);
+      ctx.restore();
+
+      // Aura néon de mise en valeur centrale
+      const aura = ctx.createRadialGradient(
+        imgX + imgW / 2, imgY + imgH / 2, 20, 
+        imgX + imgW / 2, imgY + imgH / 2, 250
+      );
+      aura.addColorStop(0, 'rgba(234, 179, 8, 0.22)');
+      aura.addColorStop(0.5, 'rgba(219, 39, 119, 0.12)');
+      aura.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = aura;
+      ctx.beginPath();
+      ctx.arc(imgX + imgW / 2, imgY + imgH / 2, 250, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Émoji principal haute définition avec ombre portée
+      ctx.font = '180px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#ffffff';
+      ctx.save();
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+      ctx.shadowBlur = 25;
+      ctx.shadowOffsetY = 12;
+      ctx.fillText(activeNewsItem.emoji || '📰', imgX + imgW / 2, imgY + imgH / 2);
+      ctx.restore();
+
+      // Étiquettes techniques (Tech spec branding digne d'un DA)
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+      ctx.font = '700 18px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(`[ RSG // CREATIVE STICKER SYSTEM ]`, imgX + imgW / 2, imgY + imgH - 50);
+      
+      ctx.textAlign = 'left';
+      ctx.fillText(`SYS.NO // ${activeNewsItem.cat.toUpperCase()}_FLBK`, imgX + 45, imgY + 50);
+      ctx.textAlign = 'right';
+      ctx.fillText(`LAT.2026 // QG`, imgX + imgW - 45, imgY + 50);
     }
     ctx.restore();
 
-    // 3. Dessiner la carte de contenu (Positionnée à y=1240)
+    // 3. Dessiner la carte de contenu (Positionnée à y=1230 avec plus de liberté)
     const cardX = 80;
-    const cardY = 1240;
+    const cardY = 1230;
     const cardW = 920;
     const cardH = 430;
     const cardRadius = 24;
 
     ctx.save();
-    ctx.fillStyle = 'rgba(15, 23, 42, 0.82)'; // Slate-900 transparent d'une grande profondeur
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.85)'; // Slate-900 transparent d'une grande profondeur
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
     ctx.lineWidth = 2;
     drawRoundedRect(ctx, cardX, cardY, cardW, cardH, cardRadius);
