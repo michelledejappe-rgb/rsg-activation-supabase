@@ -838,6 +838,8 @@ body {
   .qg-hero-header {
     margin: 2rem auto 1.5rem auto;
     padding: 0 1.2rem;
+    max-width: 100% !important;
+    overflow: hidden !important;
   }
 
   .hero-title {
@@ -851,6 +853,8 @@ body {
   .qg-mosaic-section {
     padding: 0 1.2rem;
     margin-bottom: 2rem;
+    max-width: 100% !important;
+    overflow: hidden !important;
   }
 
   .mosaic-grid {
@@ -915,6 +919,15 @@ body {
   .qg-main-layout {
     padding: 0 1.2rem;
     gap: 25px;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  .qg-main-layout > section,
+  .qg-main-layout > aside {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
   }
 
   .header-container {
