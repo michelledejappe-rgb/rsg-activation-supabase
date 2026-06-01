@@ -17,6 +17,12 @@ export default function Home() {
   const [feedbackText, setFeedbackText] = useState('');
   const [feedbackStatus, setFeedbackStatus] = useState('');
 
+  // États de l'Insta-Story Studio B2C
+  const [showStoryStudio, setShowStoryStudio] = useState(false);
+  const [selectedSticker, setSelectedSticker] = useState('hype');
+  const [generatingStory, setGeneratingStory] = useState(false);
+  const [storyImageUrl, setStoryImageUrl] = useState(null);
+
   const [trends, setTrends] = useState([
     { name: 'One Piece (Arc Elbaph)', value: 0, target: 94 },
     { name: 'Star Wars (The Mandalorian)', value: 0, target: 87 },
@@ -52,6 +58,324 @@ export default function Home() {
     }, 150);
     return () => clearTimeout(timer);
   }, [loading]);
+
+  // Régénérer l'image de Story dès que le studio s'ouvre ou que le sticker change
+  useEffect(() => {
+    if (showStoryStudio && activeNewsItem) {
+      renderStory(selectedSticker);
+    }
+  }, [showStoryStudio, selectedSticker, activeNewsItem]);
+
+  // Fonction de rendu Canvas pour générer un visuel Story HD (1080x1920 px)
+  const renderStory = (stickerType) => {
+    if (!activeNewsItem) return;
+    setGeneratingStory(true);
+    
+    const canvas = document.createElement('canvas');
+    canvas.width = 1080;
+    canvas.height = 1920;
+    const ctx = canvas.getContext('2d');
+    
+    // Fond Dégradé Sombre
+    const gradient = ctx.createLinearGradient(0, 0, 0, 1920);
+    gradient.addColorStop(0, '#0f172a');
+    gradient.addColorStop(0.5, '#020617');
+    gradient.addColorStop(1, '#0f172a');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 1080, 1920);
+    
+    // Lueurs d'ambiance radiales
+    const radialGlowTop = ctx.createRadialGradient(540, 200, 50, 540, 200, 600);
+    radialGlowTop.addColorStop(0, 'rgba(234, 179, 8, 0.18)');
+    radialGlowTop.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = radialGlowTop;
+    ctx.fillRect(0, 0, 1080, 1920);
+    
+    const radialGlowBottom = ctx.createRadialGradient(540, 1600, 50, 540, 1600, 600);
+    radialGlowBottom.addColorStop(0, 'rgba(219, 39, 119, 0.1)');
+    radialGlowBottom.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = radialGlowBottom;
+    ctx.fillRect(0, 0, 1080, 1920);
+
+    // Trame de points Dot-Grid
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
+    for (let x = 20; x < 1080; x += 40) {
+      for (let y = 20; y < 1920; y += 40) {
+        ctx.beginPath();
+        ctx.arc(x, y, 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Charger l'image avec support CORS anonyme
+    const mainImg = new Image();
+    mainImg.crossOrigin = "anonymous";
+    
+    const drawContent = () => {
+      // Cadre Polaroid Central
+      const cardX = 90;
+      const cardY = 320;
+      const cardW = 900;
+      const cardH = 720;
+      const cardRadius = 32;
+      
+      // Ombre du cadre
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+      ctx.shadowBlur = 40;
+      ctx.shadowOffsetY = 15;
+      
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.98)';
+      drawRoundedRect(ctx, cardX, cardY, cardW, cardH, cardRadius);
+      ctx.fill();
+      
+      // Reset de l'ombre
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetY = 0;
+      
+      // Image à l'intérieur
+      const imgX = cardX + 30;
+      const imgY = cardY + 30;
+      const imgW = cardW - 60;
+      const imgH = cardH - 180;
+      const imgRadius = 16;
+      
+      ctx.save();
+      ctx.beginPath();
+      drawRoundedRect(ctx, imgX, imgY, imgW, imgH, imgRadius);
+      ctx.clip();
+      
+      try {
+        if (mainImg.complete && mainImg.naturalWidth > 0) {
+          const imgRatio = mainImg.width / mainImg.height;
+          const boxRatio = imgW / imgH;
+          let srcX = 0, srcY = 0, srcW = mainImg.width, srcH = mainImg.height;
+          
+          if (imgRatio > boxRatio) {
+            srcW = mainImg.height * boxRatio;
+            srcX = (mainImg.width - srcW) / 2;
+          } else {
+            srcH = mainImg.width / boxRatio;
+            srcY = (mainImg.height - srcH) / 2;
+          }
+          ctx.drawImage(mainImg, srcX, srcY, srcW, srcH, imgX, imgY, imgW, imgH);
+        } else {
+          throw new Error();
+        }
+      } catch (e) {
+        // Fallback dégradé néon + émoji si l'image ne charge pas (CORS ou inexistant)
+        const neonGrad = ctx.createLinearGradient(imgX, imgY, imgX, imgY + imgH);
+        neonGrad.addColorStop(0, '#eab308');
+        neonGrad.addColorStop(1, '#db2777');
+        ctx.fillStyle = neonGrad;
+        ctx.fillRect(imgX, imgY, imgW, imgH);
+        
+        ctx.font = '140px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(activeNewsItem.emoji || '📰', imgX + imgW / 2, imgY + imgH / 2);
+      }
+      ctx.restore();
+
+      // Texte de la photo Polaroid
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 34px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+      ctx.fillText(`🛡️ ROAD SIXTY GEEK • ACTUALITÉ`, imgX, imgY + imgH + 45);
+      
+      ctx.fillStyle = '#64748b';
+      ctx.font = '700 26px sans-serif';
+      ctx.fillText(getDisplayTime(activeNewsItem).toUpperCase(), imgX, imgY + imgH + 95);
+
+      // Header de la Story
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#eab308';
+      ctx.beginPath();
+      ctx.moveTo(540, 100);
+      ctx.lineTo(580, 115);
+      ctx.lineTo(570, 175);
+      ctx.lineTo(540, 200);
+      ctx.lineTo(510, 175);
+      ctx.lineTo(500, 115);
+      ctx.closePath();
+      ctx.fill();
+      
+      ctx.fillStyle = '#000000';
+      ctx.font = 'bold 40px sans-serif';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('QG', 540, 150);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 44px sans-serif';
+      ctx.fillText('ROAD SIXTY GEEK', 540, 250);
+
+      // Sticker Hype Diagonal
+      const STICKERS = {
+        hype: { label: '🔥 HYPE MAXIMALE', color: '#eab308', textColor: '#000000' },
+        drop: { label: '🚨 ALERTE DROP', color: '#ef4444', textColor: '#ffffff' },
+        pepite: { label: '💎 PÉPITE GEEK', color: '#0891b2', textColor: '#ffffff' },
+        collection: { label: '💸 DIRECT EN COLLECTION', color: '#10b981', textColor: '#ffffff' }
+      };
+      
+      const sticker = STICKERS[stickerType] || STICKERS.hype;
+      
+      ctx.save();
+      ctx.translate(540, 1100);
+      ctx.rotate(-0.05);
+      
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+      ctx.shadowBlur = 15;
+      ctx.shadowOffsetY = 5;
+      
+      ctx.fillStyle = sticker.color;
+      drawRoundedRect(ctx, -380, -45, 760, 90, 16);
+      ctx.fill();
+      
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      
+      ctx.fillStyle = sticker.textColor;
+      ctx.font = '900 36px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(`//  ${sticker.label}  //`, 0, 0);
+      ctx.restore();
+
+      // Titre & Description de la Story
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+      
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 48px sans-serif';
+      const maxTitleWidth = 900;
+      const startX = 90;
+      let startY = 1240;
+      
+      const titleLines = wrapText(ctx, activeNewsItem.title, maxTitleWidth);
+      titleLines.forEach(line => {
+        ctx.fillText(line, startX, startY);
+        startY += 62;
+      });
+      
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = '500 28px sans-serif';
+      startY += 25;
+      
+      const cleanDesc = activeNewsItem.text.split('. ')[0] + '.';
+      const descLines = wrapText(ctx, cleanDesc, maxTitleWidth);
+      descLines.slice(0, 3).forEach(line => {
+        ctx.fillText(line, startX, startY);
+        startY += 42;
+      });
+
+      // Footer : Sticker de Lien
+      const footerY = 1750;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+      ctx.shadowBlur = 12;
+      ctx.shadowOffsetY = 6;
+
+      ctx.fillStyle = '#ffffff';
+      drawRoundedRect(ctx, 540 - 240, footerY - 45, 480, 90, 45);
+      ctx.fill();
+      
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      
+      ctx.fillStyle = '#0891b2';
+      ctx.font = 'bold 34px sans-serif';
+      ctx.fillText('🔗 roadsixtygeek.com', 540, footerY);
+
+      try {
+        const url = canvas.toDataURL('image/png');
+        setStoryImageUrl(url);
+      } catch (err) {
+        console.error("Canvas export error:", err);
+      } finally {
+        setGeneratingStory(false);
+      }
+    };
+    
+    // Chargement intelligent de l'image
+    if (activeNewsItem.img) {
+      mainImg.onload = drawContent;
+      mainImg.onerror = drawContent;
+      mainImg.src = activeNewsItem.img;
+    } else {
+      setTimeout(drawContent, 50);
+    }
+  };
+
+  // Partager le fichier PNG nativement (Web Share API)
+  const shareStory = async () => {
+    if (!storyImageUrl) return;
+    try {
+      const res = await fetch(storyImageUrl);
+      const blob = await res.blob();
+      const file = new File([blob], `R6G_Story_${activeNewsItem.cat}.png`, { type: 'image/png' });
+      
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: `Road Sixty Geek Story`,
+          text: `Découvre les nouveautés Pop Culture !`
+        });
+      } else {
+        triggerDownload();
+      }
+    } catch (err) {
+      console.error("Share error:", err);
+      triggerDownload();
+    }
+  };
+
+  // Télécharger l'image PNG en fallback
+  const triggerDownload = () => {
+    if (!storyImageUrl) return;
+    const link = document.createElement('a');
+    link.download = `R6G_Story_${activeNewsItem.cat}_${Date.now()}.png`;
+    link.href = storyImageUrl;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Helpers pour le Canvas
+  function drawRoundedRect(ctx, x, y, width, height, radius) {
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + width - radius, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+    ctx.lineTo(x + width, y + height - radius);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    ctx.lineTo(x + radius, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.closePath();
+  }
+
+  function wrapText(ctx, text, maxWidth) {
+    const words = text.split(' ');
+    const lines = [];
+    let currentLine = '';
+    for (let i = 0; i < words.length; i++) {
+      const testLine = currentLine + words[i] + ' ';
+      const testWidth = ctx.measureText(testLine).width;
+      if (testWidth > maxWidth && i > 0) {
+        lines.push(currentLine.trim());
+        currentLine = words[i] + ' ';
+      } else {
+        currentLine = testLine;
+      }
+    }
+    lines.push(currentLine.trim());
+    return lines;
+  }
 
   // Dictionnaire de traduction et emojis pour les catégories
   const CATEGORIES = {
@@ -585,6 +909,156 @@ export default function Home() {
                 <div className="analysis-commentary">
                   <strong>Le mot de la Rédac :</strong> Cette annonce fait déjà vibrer toute la communauté geek sur les réseaux ! L'engouement constaté notamment sur notre compte Instagram montre que les passionnés attendent ce drop au tournant. Préparez-vous et restez à l'affût, les stocks risquent de s'écouler à vitesse grand V dès la sortie officielle !
                 </div>
+              </div>
+
+              {/* Bouton Insta-Story Studio B2C */}
+              <div style={{ marginTop: '20px', borderTop: '1px solid var(--border-white)', paddingTop: '20px', textAlign: 'center' }}>
+                <button 
+                  onClick={() => setShowStoryStudio(true)}
+                  className="play-quiz-btn"
+                  style={{ width: '100%', justifyContent: 'center', background: 'linear-gradient(135deg, #eab308 0%, #ca8a04 100%)', color: 'black', border: 'none', padding: '12px', fontSize: '0.95rem', borderRadius: '12px' }}
+                >
+                  📸 Insta-Story Studio (Générer une Story 9:16)
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Insta-Story Studio Modal Overlay */}
+      {showStoryStudio && activeNewsItem && (
+        <div className="news-modal-overlay" style={{ zIndex: 1100 }} onClick={() => setShowStoryStudio(false)}>
+          <div className="news-modal-content" style={{ maxWidth: '460px', display: 'flex', flexDirection: 'column', gap: '15px', padding: '1.5rem' }} onClick={(e) => e.stopPropagation()}>
+            <button className="close-modal-btn" onClick={() => setShowStoryStudio(false)}>
+              &times;
+            </button>
+            
+            <div style={{ textAlign: 'center' }}>
+              <h3 style={{ fontFamily: 'var(--font-head)', fontWeight: '800', fontSize: '1.25rem', color: 'var(--color-dark)', marginBottom: '4px' }}>📸 Insta-Story Studio</h3>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Créez un visuel HD 9:16 personnalisé prêt pour Instagram</p>
+            </div>
+
+            {/* Zone de prévisualisation de l'image Story générée */}
+            <div style={{ position: 'relative', background: '#020617', borderRadius: '12px', border: '1px solid var(--border-white)', display: 'grid', placeItems: 'center', minHeight: '340px', overflow: 'hidden', boxShadow: 'var(--shadow-md)' }}>
+              {generatingStory ? (
+                <div style={{ color: '#ffffff', fontSize: '0.85rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+                  <div className="sync-dot" style={{ background: 'var(--color-yellow)', boxShadow: '0 0 10px var(--color-yellow)', width: '12px', height: '12px' }}></div>
+                  Génération du visuel HD...
+                </div>
+              ) : storyImageUrl ? (
+                <img 
+                  src={storyImageUrl} 
+                  alt="Aperçu Story Instagram" 
+                  style={{ width: '100%', height: 'auto', display: 'block', maxHeight: '400px', objectFit: 'contain' }} 
+                />
+              ) : (
+                <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Erreur de génération</div>
+              )}
+            </div>
+
+            {/* Sélecteur de Sticker Hype */}
+            <div>
+              <h4 style={{ fontSize: '0.75rem', fontWeight: '800', color: 'var(--color-dark)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>1. Choisissez votre Badge Story</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                <button 
+                  onClick={() => setSelectedSticker('hype')}
+                  style={{ 
+                    padding: '8px', 
+                    borderRadius: '8px', 
+                    fontSize: '0.7rem', 
+                    fontWeight: '700', 
+                    cursor: 'pointer',
+                    border: '1px solid',
+                    borderColor: selectedSticker === 'hype' ? 'var(--color-yellow)' : 'var(--border-white)',
+                    background: selectedSticker === 'hype' ? 'var(--color-yellow-glow)' : 'var(--bg-dark)',
+                    color: selectedSticker === 'hype' ? '#b28b03' : 'var(--text-secondary)',
+                    transition: 'var(--transition-smooth)'
+                  }}
+                >
+                  🔥 Hype Maximale
+                </button>
+                <button 
+                  onClick={() => setSelectedSticker('drop')}
+                  style={{ 
+                    padding: '8px', 
+                    borderRadius: '8px', 
+                    fontSize: '0.7rem', 
+                    fontWeight: '700', 
+                    cursor: 'pointer',
+                    border: '1px solid',
+                    borderColor: selectedSticker === 'drop' ? '#ef4444' : 'var(--border-white)',
+                    background: selectedSticker === 'drop' ? 'rgba(239, 68, 68, 0.08)' : 'var(--bg-dark)',
+                    color: selectedSticker === 'drop' ? '#ef4444' : 'var(--text-secondary)',
+                    transition: 'var(--transition-smooth)'
+                  }}
+                >
+                  🚨 Alerte Drop
+                </button>
+                <button 
+                  onClick={() => setSelectedSticker('pepite')}
+                  style={{ 
+                    padding: '8px', 
+                    borderRadius: '8px', 
+                    fontSize: '0.7rem', 
+                    fontWeight: '700', 
+                    cursor: 'pointer',
+                    border: '1px solid',
+                    borderColor: selectedSticker === 'pepite' ? 'var(--color-cyan)' : 'var(--border-white)',
+                    background: selectedSticker === 'pepite' ? 'rgba(8, 145, 178, 0.08)' : 'var(--bg-dark)',
+                    color: selectedSticker === 'pepite' ? 'var(--color-cyan)' : 'var(--text-secondary)',
+                    transition: 'var(--transition-smooth)'
+                  }}
+                >
+                  💎 Pépite Geek
+                </button>
+                <button 
+                  onClick={() => setSelectedSticker('collection')}
+                  style={{ 
+                    padding: '8px', 
+                    borderRadius: '8px', 
+                    fontSize: '0.7rem', 
+                    fontWeight: '700', 
+                    cursor: 'pointer',
+                    border: '1px solid',
+                    borderColor: selectedSticker === 'collection' ? 'var(--color-green)' : 'var(--border-white)',
+                    background: selectedSticker === 'collection' ? 'rgba(16, 185, 129, 0.08)' : 'var(--bg-dark)',
+                    color: selectedSticker === 'collection' ? 'var(--color-green)' : 'var(--text-secondary)',
+                    transition: 'var(--transition-smooth)'
+                  }}
+                >
+                  💸 Direct Collection
+                </button>
+              </div>
+            </div>
+
+            {/* Actions de partage */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '5px' }}>
+              <button 
+                onClick={shareStory}
+                disabled={generatingStory || !storyImageUrl}
+                className="play-quiz-btn"
+                style={{ width: '100%', justifyContent: 'center', background: 'linear-gradient(135deg, #c13584 0%, #e1306c 100%)', color: '#ffffff', borderColor: 'transparent', padding: '12px', fontSize: '0.85rem', borderRadius: '10px' }}
+              >
+                📲 Partager directement en Story
+              </button>
+              
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button 
+                  onClick={triggerDownload}
+                  disabled={generatingStory || !storyImageUrl}
+                  className="play-quiz-btn"
+                  style={{ flex: 1, justifyContent: 'center', background: 'var(--bg-glass)', color: 'var(--color-dark)', borderColor: 'var(--border-white)', padding: '10px', fontSize: '0.8rem', borderRadius: '10px' }}
+                >
+                  💾 Télécharger PNG
+                </button>
+                <button 
+                  onClick={() => setShowStoryStudio(false)}
+                  className="play-quiz-btn"
+                  style={{ flex: 1, justifyContent: 'center', background: 'var(--bg-dark)', color: 'var(--color-yellow)', borderColor: 'var(--color-dark)', padding: '10px', fontSize: '0.8rem', borderRadius: '10px' }}
+                >
+                  Retour
+                </button>
               </div>
             </div>
           </div>
