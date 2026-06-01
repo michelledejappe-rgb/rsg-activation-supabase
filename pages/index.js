@@ -155,6 +155,7 @@ export default function Home() {
     <div className="min-h-screen bg-black text-white relative">
       <Head>
         <title>Road Sixty Geek (QG) — Actu Pop Culture, Mangas & Licences</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="description" content="Découvrez toute l'actualité pop culture, mangas, animes, cinéma et les collabs de marque les plus folles !" />
         <link rel="icon" href="/favicon.ico" />
         <link rel="canonical" href="https://roadsixtygeek.com" />
