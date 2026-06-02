@@ -1235,3 +1235,61 @@
         min-height: 80px;
     }
 }
+
+/* ==========================================================================
+   AJUSTEMENTS DE SCROLLING & RESPONSIVITÉ POUR LE CONCOURS ET LE PARTAGE
+   ========================================================================== */
+.hp-quiz-viewport #screen-intro.active,
+.hp-quiz-viewport #screen-gameover.active {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    overflow-y: auto;
+    max-height: 100%;
+    padding: 10px 5px 30px 5px;
+    gap: 15px;
+}
+
+/* Personnalisation de la barre de défilement pour garder le look magique */
+.hp-quiz-viewport #screen-intro::-webkit-scrollbar,
+.hp-quiz-viewport #screen-gameover::-webkit-scrollbar {
+    width: 6px;
+}
+
+.hp-quiz-viewport #screen-intro::-webkit-scrollbar-track,
+.hp-quiz-viewport #screen-gameover::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.hp-quiz-viewport #screen-intro::-webkit-scrollbar-thumb,
+.hp-quiz-viewport #screen-gameover::-webkit-scrollbar-thumb {
+    background: rgba(234, 128, 252, 0.2);
+    border-radius: 4px;
+}
+
+.hp-quiz-viewport #screen-intro::-webkit-scrollbar-thumb:hover,
+.hp-quiz-viewport #screen-gameover::-webkit-scrollbar-thumb:hover {
+    background: rgba(234, 128, 252, 0.4);
+}
+
+/* Ajustements pour mobile très court ou petits écrans */
+@media (max-width: 768px) {
+    .hp-quiz-viewport .setup-container {
+        padding: 12px;
+        gap: 10px;
+    }
+    .hp-quiz-viewport .contest-intro-box {
+        padding: 8px 10px !important;
+        font-size: 0.76rem !important;
+        margin-bottom: 6px !important;
+    }
+    .hp-quiz-viewport .share-preplay-container,
+    .hp-quiz-viewport .share-postplay-container {
+        margin-top: 10px !important;
+        padding-top: 8px !important;
+    }
+    .hp-quiz-viewport .share-social-btn {
+        padding: 4px 8px !important;
+        font-size: 0.65rem !important;
+    }
+}
