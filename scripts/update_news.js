@@ -98,7 +98,8 @@ function analyzeTitle(title, cat) {
   let query = entity || title.split(/[,:–]/).shift().trim();
 
   // Spécialisation par contexte
-  if (t.includes('g-shock') && t.includes('gundam')) query = 'Casio G-SHOCK Gundam RX-78-2 DW-5600 2026';
+  if (t.includes('goldorak') || t.includes('grendizer')) query = 'Casio G-Shock Goldorak U GA-110 Grendizer watch';
+  else if (t.includes('g-shock') && t.includes('gundam')) query = 'Casio G-SHOCK Gundam RX-78-2 DW-5600 2026';
   else if (t.includes('minas tirith')) query = 'LEGO Minas Tirith 11377 Lord of the Rings 2026';
   else if (t.includes('mitsuri')) query = 'Demon Slayer Mitsuri Kanroji ufotable';
   else if (t.includes('infinity castle')) query = 'Demon Slayer Infinity Castle movie';

@@ -217,6 +217,7 @@ function buildSearchQuery(title, cat) {
   const lower = title.toLowerCase();
 
   // Enrichissements contextuels basés sur le contenu du titre
+  if (lower.includes('goldorak') || lower.includes('grendizer')) return 'Casio G-Shock Goldorak U GA-110 Grendizer watch official';
   if (lower.includes('g-shock') || (lower.includes('casio') && lower.includes('gundam'))) return 'Casio G-SHOCK Gundam RX-78-2 DW-5600 2026 watch official photo';
   if (lower.includes('minas tirith') || (lower.includes('lego') && lower.includes('lord')))  return 'LEGO Minas Tirith 11377 Lord of the Rings set official product 2026';
   if (lower.includes('mitsuri'))                                                               return 'Demon Slayer Mitsuri Kanroji ufotable birthday 2026 anime illustration';
