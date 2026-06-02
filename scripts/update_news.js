@@ -383,21 +383,133 @@ async function getExactImage(title, cat) {
 // =========================================================
 // Boucle principale du cron
 // =========================================================
+// =========================================================
+// Récupération des flux de presse RSS (Actualisation 100% autonome sans fichiers)
+// =========================================================
+async function fetchRSSNews() {
+  const feeds = [
+    { url: "https://www.manga-news.com/index.php/feed/news", cat: "manga", defaultEmoji: "📖" },
+    { url: "https://www.allocine.fr/rss/news.xml", cat: "cine", defaultEmoji: "🎬" },
+    { url: "https://hypebeast.com/feed", cat: "collab", defaultEmoji: "🧸" }
+  ];
+  
+  const rssNews = [];
+  console.log("[RSS] Récupération des actualités en direct des flux de presse...");
+  
+  for (const feed of feeds) {
+    try {
+      const res = await fetch(feed.url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+        },
+        signal: AbortSignal.timeout(6000)
+      });
+      if (!res.ok) continue;
+      
+      const xml = await res.text();
+      const itemRegex = /<item>([\s\S]*?)<\/item>/g;
+      let match;
+      let count = 0;
+      
+      while ((match = itemRegex.exec(xml)) !== null && count < 6) {
+        const itemContent = match[1];
+        
+        const titleMatch = itemContent.match(/<title>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>/);
+        const descMatch = itemContent.match(/<description>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/description>/);
+        const linkMatch = itemContent.match(/<link>([\s\S]*?)<\/link>/);
+        const pubDateMatch = itemContent.match(/<pubDate>([\s\S]*?)<\/pubDate>/);
+        
+        let img = null;
+        const enclosureMatch = itemContent.match(/<enclosure[^>]+url=["'](https?:\/\/[^"']+)["']/);
+        const mediaMatch = itemContent.match(/<media:content[^>]+url=["'](https?:\/\/[^"']+)["']/);
+        
+        if (enclosureMatch) img = enclosureMatch[1];
+        else if (mediaMatch) img = mediaMatch[1];
+        else if (descMatch) {
+          const imgInDesc = descMatch[1].match(/<img[^>]+src=["'](https?:\/\/[^"']+)["']/);
+          if (imgInDesc) img = imgInDesc[1];
+        }
+        
+        const title = titleMatch ? titleMatch[1].trim().replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/<!\[CDATA\[|\]\]>/g, '') : '';
+        let desc = descMatch ? descMatch[1].trim().replace(/<[^>]*>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/<!\[CDATA\[|\]\]>/g, '') : '';
+        if (desc.length > 250) desc = desc.slice(0, 247) + '...';
+        
+        if (!title || !desc) continue;
+        
+        const pubDate = pubDateMatch ? new Date(pubDateMatch[1].trim()).toISOString() : new Date().toISOString();
+        
+        // Formater date_str
+        const dayStr = new Date(pubDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+        const sourceLabel = feed.url.includes('allocine') ? 'AlloCiné' : feed.url.includes('manga-news') ? 'MangaNews' : 'Hypebeast';
+        
+        rssNews.push({
+          cat: feed.cat,
+          emoji: feed.defaultEmoji,
+          date_str: `${dayStr} · ${sourceLabel}`,
+          title: title.slice(0, 150),
+          text: desc,
+          hot: count === 0,
+          img: img || null,
+          published_at: pubDate
+        });
+        count++;
+      }
+    } catch (e) {
+      console.warn(`[RSS] Impossible de lire le flux ${feed.url}: ${e.message}`);
+    }
+  }
+  
+  console.log(`[RSS] ${rssNews.length} actualités presse récupérées avec succès !`);
+  return rssNews;
+}
+
+// =========================================================
+// Boucle principale du cron
+// =========================================================
 async function run() {
   const payloadPath = getLatestPayload();
-  if (!payloadPath) { process.exit(1); }
+  let payloadNews = [];
+  if (payloadPath) {
+    try {
+      const payload = JSON.parse(fs.readFileSync(payloadPath, 'utf8'));
+      if (Array.isArray(payload.news)) {
+        payloadNews = payload.news;
+      }
+    } catch (e) {
+      console.warn('[Cron] Impossible de lire le payload local:', e.message);
+    }
+  }
 
-  const payload = JSON.parse(fs.readFileSync(payloadPath, 'utf8'));
-  if (!Array.isArray(payload.news)) { console.error('[Cron] payload.news invalide'); process.exit(1); }
+  // 1. Récupérer les flux RSS presse en temps réel pour actualisation automatique 100% autonome
+  let rssNews = [];
+  try {
+    rssNews = await fetchRSSNews();
+  } catch (err) {
+    console.error('[Cron] Erreur lors de la récupération des flux RSS :', err.message);
+  }
 
-  console.log(`[Cron] ${payload.news.length} actualités à traiter...\n`);
+  // 2. Fusionner les actualités (les flux RSS d'abord pour avoir la fraîcheur absolue)
+  const allNewsRaw = [...rssNews, ...payloadNews];
+  
+  // Dédoublonner par titre pour éviter les doublons lors des runs successifs
+  const uniqueTitles = new Set();
+  const allNewsFiltered = [];
+  for (const item of allNewsRaw) {
+    if (!item.title) continue;
+    const cleanTitle = item.title.trim().toLowerCase();
+    if (!uniqueTitles.has(cleanTitle)) {
+      uniqueTitles.add(cleanTitle);
+      allNewsFiltered.push(item);
+    }
+  }
+
+  console.log(`[Cron] ${allNewsFiltered.length} actualités totales à traiter (dont ${rssNews.length} issues de flux RSS)... \n`);
 
   const newsToUpsert = [];
-  for (let i = 0; i < payload.news.length; i++) {
-    const item = payload.news[i];
+  for (let i = 0; i < allNewsFiltered.length; i++) {
+    const item = allNewsFiltered[i];
     const publishedAt = item.published_at || new Date(Date.now() - i * 30 * 60 * 1000).toISOString();
 
-    // Conserver l'image si elle existe déjà (pas besoin de re-scraper)
     const forceUpdate = process.argv.includes('--force');
     const existingImg = (!forceUpdate && item.img?.startsWith('http')) ? item.img : null;
     let img = existingImg;
@@ -407,7 +519,7 @@ async function run() {
       // Pause entre les requêtes pour respecter les rate limits
       await new Promise(r => setTimeout(r, 800));
     } else {
-      console.log(`[Cron] [${i + 1}/${payload.news.length}] Image déjà présente ✓`);
+      console.log(`[Cron] [${i + 1}/${allNewsFiltered.length}] Image déjà présente ✓`);
     }
 
     newsToUpsert.push({
@@ -422,22 +534,22 @@ async function run() {
     });
   }
 
-  // Sauvegarde locale
-  try {
-    fs.writeFileSync(payloadPath, JSON.stringify({ ...payload, news: newsToUpsert }, null, 2));
-    const found   = newsToUpsert.filter(n => n.img).length;
-    const missing = newsToUpsert.filter(n => !n.img).length;
-    console.log(`\n[Cron] ✅ Payload mis à jour : ${found}/${newsToUpsert.length} images trouvées`);
-    if (missing > 0) console.log(`[Cron] ℹ️  ${missing} articles sans image → design prestige Story activé`);
-  } catch (e) {
-    console.error('[Cron] Erreur écriture payload :', e.message);
+  // Sauvegarde locale dans le dernier payload (uniquement pour les news statiques de structure)
+  if (payloadPath) {
+    try {
+      const payload = JSON.parse(fs.readFileSync(payloadPath, 'utf8'));
+      fs.writeFileSync(payloadPath, JSON.stringify({ ...payload, news: newsToUpsert.filter(n => !n.date_str.includes('AlloCiné') && !n.date_str.includes('MangaNews') && !n.date_str.includes('Hypebeast')) }, null, 2));
+      console.log(`\n[Cron] Payload local mis à jour.`);
+    } catch (e) {
+      console.error('[Cron] Erreur écriture payload :', e.message);
+    }
   }
 
   // Sync Supabase
   try {
     const { error } = await supabase.from('news').upsert(newsToUpsert, { onConflict: 'title' });
     if (error) throw error;
-    console.log(`[Cron] ✅ Supabase synchronisé (${newsToUpsert.length} actus)`);
+    console.log(`[Cron] ✅ Supabase synchronisé (${newsToUpsert.length} actus, dont RSS et Payloads)`);
   } catch (e) {
     console.warn(`[Cron] ⚠️ Supabase inaccessible : ${e.message}`);
   }
