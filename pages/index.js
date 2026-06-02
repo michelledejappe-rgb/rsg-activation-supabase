@@ -440,7 +440,7 @@ export default function Home() {
               </div>
             )}
             
-            <button className="play-quiz-btn" onClick={() => window.location.href = 'https://roadsixtygeek.com/activation'}>
+            <button className="play-quiz-btn" onClick={() => window.location.href = '/activation'}>
               🎮 Jouer au Challenge
             </button>
           </div>

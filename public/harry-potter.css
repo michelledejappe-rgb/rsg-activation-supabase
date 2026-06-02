@@ -1,0 +1,1237 @@
+/* ==========================================================================
+   DESIGN SYSTEM & VARIABLES DE THÈME
+   ========================================================================== */
+.hp-quiz-viewport {
+    /* Couleurs de fond sombres et premium */
+    --bg-darker: #05020a;
+    --bg-dark: #0f071e;
+    --bg-card: rgba(18, 9, 36, 0.75);
+    --border-glass: rgba(255, 255, 255, 0.08);
+    --border-glass-hover: rgba(255, 255, 255, 0.16);
+    --shadow-glow: 0 4px 24px 0 rgba(106, 27, 154, 0.15);
+
+    /* Couleurs de base par défaut */
+    --theme-primary: #8e24aa;
+    --theme-primary-hover: #ab47bc;
+    --theme-accent: #ea80fc;
+    --theme-accent-glow: rgba(234, 128, 252, 0.3);
+
+    /* États universels */
+    --color-success: #00e676;
+    --color-error: #ff1744;
+    --color-info: #00e5ff;
+    --color-text: #f3e5f5;
+    --color-text-muted: #9e8fb2;
+}
+
+/* --- THÈMES DE MAISON DE POUDLARD --- */
+.hp-quiz-viewport.gryffindor-theme {
+    --theme-primary: #740001;
+    --theme-primary-hover: #ae0001;
+    --theme-accent: #eeba30;
+    --theme-accent-glow: rgba(238, 186, 48, 0.35);
+    --shadow-glow: 0 4px 24px 0 rgba(116, 0, 1, 0.25);
+}
+
+.hp-quiz-viewport.slytherin-theme {
+    --theme-primary: #1a472a;
+    --theme-primary-hover: #2a623d;
+    --theme-accent: #2ecc71;
+    --theme-accent-glow: rgba(46, 204, 113, 0.35);
+    --shadow-glow: 0 4px 24px 0 rgba(26, 71, 42, 0.3);
+}
+
+.hp-quiz-viewport.ravenclaw-theme {
+    --theme-primary: #0e1a40;
+    --theme-primary-hover: #222f5b;
+    --theme-accent: #00d2ff;
+    --theme-accent-glow: rgba(0, 210, 255, 0.35);
+    --shadow-glow: 0 4px 24px 0 rgba(14, 26, 64, 0.3);
+}
+
+.hp-quiz-viewport.hufflepuff-theme {
+    --theme-primary: #ecb939;
+    --theme-primary-hover: #f0c75e;
+    --theme-accent: #ffeb3b;
+    --theme-accent-glow: rgba(255, 235, 59, 0.3);
+    --shadow-glow: 0 4px 24px 0 rgba(236, 185, 57, 0.25);
+    --btn-primary-text: #111;
+}
+
+/* ==========================================================================
+   STYLE GLOBAL & CONTAINMENT DU VIEWPORT (SANS SCROLL)
+   ========================================================================== */
+.hp-quiz-viewport, .hp-quiz-viewport * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.hp-quiz-viewport {
+    height: 100dvh;
+    width: 100vw;
+    overflow: hidden; /* Empêche strictement tout défilement */
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    font-family: 'Outfit', 'Inter', sans-serif;
+    background-color: var(--bg-darker);
+    background-image: radial-gradient(circle at center, var(--bg-dark) 0%, var(--bg-darker) 100%);
+    color: var(--color-text);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Conteneur principal */
+.app-container {
+    width: 100%;
+    height: 100%;
+    max-height: 100vh;
+    max-height: 100dvh;
+    max-width: 950px;
+    margin: 0 auto;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    z-index: 1;
+}
+
+/* Étoiles en arrière-plan */
+.stars-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.stars {
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 40px 70px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 50px 160px, rgba(255,255,255,0.7), rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 90px 40px, #fff, rgba(0,0,0,0));
+    background-size: 200px 200px;
+    opacity: 0.25;
+}
+
+/* ==========================================================================
+   COMPOSANTS COMMUNS & EFFET GLASSMORPHISM
+   ========================================================================== */
+.card-glass {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-glass);
+    border-radius: 16px;
+    box-shadow: var(--shadow-glow);
+    transition: border-color 0.3s;
+}
+
+.card-glass:hover {
+    border-color: var(--border-glass-hover);
+}
+
+/* Boutons */
+.hp-quiz-viewport button {
+    cursor: pointer;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    transition: all 0.2s ease-out;
+}
+
+.btn-glow {
+    background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-hover) 100%);
+    color: var(--btn-primary-text, #fff);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    box-shadow: 0 0 12px var(--theme-accent-glow);
+    font-size: 0.95rem;
+}
+
+.btn-glow:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 0 20px var(--theme-accent);
+}
+
+.btn-glow.disabled, .btn-glow:disabled {
+    background: #2e2838;
+    box-shadow: none;
+    opacity: 0.4;
+    color: #777;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border-glass-hover);
+    color: var(--color-text);
+    padding: 12px 24px;
+    border-radius: 10px;
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* ==========================================================================
+   ÉCRANS DU JEU (GESTION DE L'AFFICHAGE)
+   ========================================================================== */
+.screen {
+    display: none;
+    opacity: 0;
+    transform: scale(0.98);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    width: 100%;
+    height: 100%;
+}
+
+.screen.active {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* ==========================================================================
+   ÉCRAN 1 : INTRO / CONFIGURATION DE DUEL
+   ========================================================================== */
+#screen-intro {
+    justify-content: center;
+    gap: 15px;
+}
+
+.game-header {
+    text-align: center;
+}
+
+.logo-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.hogwarts-crest {
+    color: var(--theme-accent);
+    filter: drop-shadow(0 0 8px var(--theme-accent-glow));
+}
+
+.game-header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 2.1rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, #fff 40%, var(--theme-accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.game-header .subtitle {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+}
+
+.setup-container {
+    max-width: 650px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.setup-container h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.2rem;
+    color: #fff;
+    border-bottom: 1px solid var(--border-glass);
+    padding-bottom: 8px;
+}
+
+.setup-container h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    color: var(--color-text-muted);
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.input-group label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+}
+
+.input-group input {
+    background: rgba(8, 3, 17, 0.7);
+    border: 1px solid var(--border-glass);
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 1rem;
+    font-family: 'Outfit', sans-serif;
+    outline: none;
+}
+
+.input-group input:focus {
+    border-color: var(--theme-accent);
+    box-shadow: 0 0 8px var(--theme-accent-glow);
+}
+
+/* Grille des maisons */
+.houses-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.house-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-glass);
+    border-radius: 10px;
+    padding: 10px 5px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.house-bg-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.house-crest-container {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+.house-icon-svg {
+    width: 100%;
+    height: 100%;
+    transition: transform 0.3s, color 0.3s;
+}
+
+.house-card:hover .house-icon-svg, .house-card.selected .house-icon-svg {
+    transform: scale(1.1) rotate(3deg);
+    filter: drop-shadow(0 0 6px currentColor);
+}
+
+.player-avatar-crest-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+}
+
+.house-card h4 {
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    z-index: 2;
+}
+
+/* Sélection des maisons */
+.house-card.gryffindor:hover, .house-card.gryffindor.selected {
+    color: #eeba30;
+    border-color: #ae0001;
+    box-shadow: 0 0 15px rgba(174, 0, 1, 0.3);
+}
+.house-card.gryffindor .house-bg-effect {
+    background: radial-gradient(circle at center, rgba(116, 0, 1, 0.25) 0%, transparent 80%);
+}
+
+.house-card.slytherin:hover, .house-card.slytherin.selected {
+    color: #2ecc71;
+    border-color: #2a623d;
+    box-shadow: 0 0 15px rgba(42, 98, 61, 0.3);
+}
+.house-card.slytherin .house-bg-effect {
+    background: radial-gradient(circle at center, rgba(26, 71, 42, 0.25) 0%, transparent 80%);
+}
+
+.house-card.ravenclaw:hover, .house-card.ravenclaw.selected {
+    color: #00d2ff;
+    border-color: #222f5b;
+    box-shadow: 0 0 15px rgba(34, 47, 91, 0.3);
+}
+.house-card.ravenclaw .house-bg-effect {
+    background: radial-gradient(circle at center, rgba(14, 26, 64, 0.3) 0%, transparent 80%);
+}
+
+.house-card.hufflepuff:hover, .house-card.hufflepuff.selected {
+    color: #ecb939;
+    border-color: #ecb939;
+    box-shadow: 0 0 15px rgba(236, 185, 57, 0.3);
+}
+.house-card.hufflepuff .house-bg-effect {
+    background: radial-gradient(circle at center, rgba(236, 185, 57, 0.15) 0%, transparent 80%);
+}
+
+.house-card:hover .house-bg-effect, .house-card.selected .house-bg-effect {
+    opacity: 1;
+}
+
+#btn-start {
+    width: 100%;
+    margin-top: 5px;
+    align-self: center;
+}
+
+/* ==========================================================================
+   ÉCRAN 2 : ARÈNE DE DUEL (OPTIMISATION DU VIEWPORT)
+   ========================================================================== */
+.arena-layout-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 8px;
+    overflow: hidden;
+}
+
+/* 1. Header (Hauteur fixée) */
+.arena-header {
+    height: 52px;
+    min-height: 52px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.level-indicator span, .global-score span {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-text-muted);
+}
+
+.level-indicator h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.15rem;
+    color: var(--theme-accent);
+}
+
+.global-score {
+    text-align: right;
+}
+
+.global-score strong {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 700;
+    font-family: monospace;
+    letter-spacing: 1px;
+}
+
+/* 2. Zone Duel (Hauteur flexible mais clampée) */
+.duel-layout {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 15px;
+    padding: 5px 10px;
+    max-height: 38vh; /* Clamp la zone visuelle à 38% du viewport */
+    min-height: 150px;
+}
+
+.fighter-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    background: rgba(22, 12, 42, 0.4);
+    border: 1px solid var(--border-glass);
+    border-radius: 12px;
+    height: 100%;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.fighter-panel.player {
+    border-left: 3px solid var(--theme-primary);
+}
+
+.fighter-panel.opponent {
+    border-right: 3px solid #eee;
+}
+
+/* Cadre de l'avatar circulaire avec de vraies images */
+.avatar-frame {
+    width: 96px;
+    height: 96px;
+    min-width: 96px;
+    min-height: 96px;
+    border-radius: 50%;
+    padding: 3px;
+    background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-accent) 100%);
+    box-shadow: 0 0 10px var(--theme-accent-glow);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.opponent .avatar-frame {
+    background: linear-gradient(135deg, #757575 0%, #eee 100%);
+}
+
+.avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: var(--bg-darker);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--bg-darker);
+}
+
+/* Cadrage photo parfait (Emma Watson, Alan Rickman...) */
+.character-portrait {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top; /* Positionne le focus sur le visage */
+}
+
+.fighter-info {
+    width: 100%;
+    text-align: center;
+}
+
+.fighter-info h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.house-tag, .difficulty-tag {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--theme-accent);
+    font-weight: 600;
+}
+
+.difficulty-tag {
+    color: var(--color-text-muted);
+}
+
+.health-container {
+    width: 100%;
+    margin-top: 4px;
+}
+
+.health-bar-bg {
+    width: 100%;
+    height: 8px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.health-bar-fill {
+    height: 100%;
+    background: linear-gradient(to right, var(--color-success) 0%, #2ecc71 100%);
+    border-radius: 4px;
+    transition: width 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+    box-shadow: 0 0 6px rgba(46, 204, 113, 0.4);
+}
+
+.opponent-hp {
+    background: linear-gradient(to left, var(--color-success) 0%, #2ecc71 100%);
+}
+
+.health-bar-fill.critical {
+    background: linear-gradient(to right, var(--color-error) 0%, #d32f2f 100%);
+    box-shadow: 0 0 6px rgba(255, 23, 68, 0.5);
+}
+
+.hp-text {
+    display: block;
+    font-size: 0.7rem;
+    font-family: monospace;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+}
+
+/* Centre (Timer, clash...) */
+.clash-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 120px;
+}
+
+.timer-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.timer-ring {
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.timer-ring-circle {
+    stroke-dasharray: 201.0;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 0.1s linear, stroke 0.3s;
+}
+
+.timer-text {
+    font-size: 1.8rem;
+    font-weight: 700;
+    font-family: 'Cinzel', monospace;
+    color: #fff;
+    text-shadow: 0 0 6px rgba(255,255,255,0.2);
+}
+
+.streak-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.streak-stars {
+    display: flex;
+    gap: 3px;
+    font-size: 1.1rem;
+}
+
+.streak-stars .star {
+    color: rgba(255,255,255,0.08);
+}
+
+.streak-stars .star.active {
+    color: var(--theme-accent);
+    text-shadow: 0 0 8px var(--theme-accent);
+}
+
+.streak-text {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    height: 10px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.streak-text.active {
+    opacity: 1;
+    color: var(--theme-accent);
+}
+
+.spell-beam-container {
+    width: 100%;
+    height: 3px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+}
+
+.spell-beam {
+    height: 100%;
+    width: 0%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-shadow: 0 0 10px 3px var(--beam-color, #fff);
+}
+
+/* 3. Console Dialogue (Hauteur fixe) */
+.magic-console {
+    height: 42px;
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 15px;
+    border: 1px dashed var(--border-glass-hover);
+    border-radius: 10px;
+}
+
+.magic-console p {
+    font-size: 0.85rem;
+    font-style: italic;
+    color: var(--color-text-muted);
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+/* 4. Question & Réponses (Hauteur fixée à 45% du viewport) */
+.question-board {
+    height: 45vh;
+    max-height: 45vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 15px;
+    gap: 8px;
+    overflow: hidden;
+}
+
+.question-header {
+    height: 20px;
+    min-height: 20px;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-glass);
+    padding-bottom: 4px;
+}
+
+.question-tracker {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+}
+
+.multiplier-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--theme-accent);
+}
+
+.question-text-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 10px;
+    overflow-y: auto; /* Permet le défilement uniquement si la question est super longue */
+}
+
+.question-text {
+    font-size: 1.1rem;
+    line-height: 1.35;
+    font-weight: 500;
+    color: #fff;
+    text-align: center;
+}
+
+/* Options Grid en 2x2 fixée */
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 8px;
+    height: 110px;
+    min-height: 110px;
+}
+
+.option-btn {
+    background: rgba(255,255,255,0.015);
+    border: 1px solid var(--border-glass);
+    border-radius: 10px;
+    padding: 0 15px;
+    color: var(--color-text);
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    outline: none;
+    height: 100%;
+    position: relative;
+}
+
+.option-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--theme-accent);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.option-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.option-btn:hover:not(:disabled)::before {
+    opacity: 1;
+}
+
+.option-btn .shortcut {
+    width: 22px;
+    height: 22px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: monospace;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    border: 1px solid var(--border-glass);
+}
+
+.option-btn .text {
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Limite à 2 lignes le texte du bouton */
+    -webkit-box-orient: vertical;
+}
+
+.option-btn.correct {
+    background: rgba(0, 230, 118, 0.08) !important;
+    border-color: var(--color-success) !important;
+    color: #fff !important;
+}
+.option-btn.correct::before {
+    background: var(--color-success) !important;
+    opacity: 1 !important;
+}
+
+.option-btn.wrong {
+    background: rgba(255, 23, 68, 0.08) !important;
+    border-color: var(--color-error) !important;
+    color: #fff !important;
+}
+.option-btn.wrong::before {
+    background: var(--color-error) !important;
+    opacity: 1 !important;
+}
+
+/* ==========================================================================
+   ÉCRAN 3 : VICTOIRE / FIN DE JEU
+   ========================================================================== */
+.gameover-container {
+    max-width: 550px;
+    width: 100%;
+    margin: auto;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+}
+
+.outcome-icon {
+    width: 80px;
+    height: 80px;
+    color: var(--theme-accent);
+}
+
+.gameover-container h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.outcome-text {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+}
+
+.stats-summary {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.stat-card {
+    flex: 1;
+    background: rgba(255,255,255,0.015);
+    border: 1px solid var(--border-glass);
+    border-radius: 10px;
+    padding: 10px 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.stat-card .label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+}
+
+.stat-card strong {
+    font-size: 1.15rem;
+    color: var(--theme-accent);
+}
+
+.leaderboard-section {
+    width: 100%;
+    border-top: 1px solid var(--border-glass);
+    padding-top: 15px;
+}
+
+.leaderboard-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    width: 100%;
+}
+
+.leaderboard-section h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.05rem;
+    margin-bottom: 0;
+}
+
+.db-status-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: 'Outfit', sans-serif;
+    transition: all 0.3s ease;
+}
+
+.db-status-badge.local {
+    background: rgba(236, 185, 57, 0.08);
+    color: #ecb939;
+    border: 1px solid rgba(236, 185, 57, 0.2);
+}
+
+.db-status-badge.global {
+    background: rgba(0, 230, 118, 0.08);
+    color: #00e676;
+    border: 1px solid rgba(0, 230, 118, 0.2);
+    box-shadow: 0 0 10px rgba(0, 230, 118, 0.1);
+}
+
+.table-container {
+    width: 100%;
+    border: 1px solid var(--border-glass);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.hp-quiz-viewport table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.hp-quiz-viewport th, .hp-quiz-viewport td {
+    padding: 8px 12px;
+}
+
+.hp-quiz-viewport th {
+    background: rgba(255,255,255,0.02);
+    color: var(--color-text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.65rem;
+    letter-spacing: 0.5px;
+}
+
+.hp-quiz-viewport tr {
+    border-bottom: 1px solid var(--border-glass);
+}
+
+.hp-quiz-viewport tr:last-child {
+    border-bottom: none;
+}
+
+.hp-quiz-viewport td .house-circle {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.actions-area {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    justify-content: center;
+}
+
+.actions-area button {
+    flex: 1;
+    max-width: 200px;
+}
+
+/* ==========================================================================
+   ANIMATIONS ET EFFETS D'ÉCLAIR
+   ========================================================================== */
+.spell-flash-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.spell-flash-overlay.active-correct {
+    background: radial-gradient(circle, var(--theme-accent-glow) 0%, transparent 75%);
+    opacity: 0.9;
+}
+
+.spell-flash-overlay.active-wrong {
+    background: radial-gradient(circle, rgba(255, 23, 68, 0.35) 0%, transparent 75%);
+    opacity: 0.9;
+}
+
+/* Tremblements */
+.shake-element {
+    animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes shake {
+    10%, 90% { transform: translate3d(-2px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-3px, 0, 0); }
+    40%, 60% { transform: translate3d(3px, 0, 0); }
+}
+
+.correct-cast {
+    animation: correctCastAnim 0.5s ease-out forwards;
+}
+
+.wrong-cast {
+    animation: wrongCastAnim 0.5s ease-out forwards;
+}
+
+@keyframes correctCastAnim {
+    0% { width: 0%; left: 0%; opacity: 1; background: linear-gradient(to right, var(--theme-accent), #fff); }
+    50% { width: 100%; left: 0%; opacity: 1; }
+    100% { width: 0%; left: 100%; opacity: 0; }
+}
+
+@keyframes wrongCastAnim {
+    0% { width: 0%; left: 100%; opacity: 1; background: linear-gradient(to left, var(--color-error), #fff); }
+    50% { width: 100%; left: 0%; opacity: 1; }
+    100% { width: 0%; left: 0%; opacity: 0; }
+}
+
+.svg-pulse {
+    animation: svgPulse 3s infinite alternate;
+}
+
+@keyframes svgPulse {
+    0% { filter: drop-shadow(0 0 5px rgba(255,255,255,0.1)); }
+    100% { filter: drop-shadow(0 0 12px var(--theme-accent)); }
+}
+
+/* ==========================================================================
+   RESPONSIVITÉ CRITIQUE (DE LA LARG. 300px À 850px)
+   ========================================================================== */
+@media (max-width: 768px) {
+    .app-container {
+        padding: 5px;
+    }
+    
+    .setup-container {
+        padding: 15px;
+        gap: 12px;
+    }
+    
+    .houses-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+    }
+    
+    .house-card {
+        padding: 8px 3px;
+    }
+    
+    .house-crest-container {
+        width: 38px;
+        height: 38px;
+    }
+    
+    /* Arena */
+    .arena-header {
+        height: 48px;
+        min-height: 48px;
+        padding: 0 12px;
+    }
+    
+    .level-indicator h3 {
+        font-size: 1rem;
+    }
+    
+    .global-score strong {
+        font-size: 1.2rem;
+    }
+    
+    /* Horizontal scaling for mobile to keep no scroll */
+    .duel-layout {
+        grid-template-columns: 1fr auto 1fr;
+        gap: 8px;
+        padding: 4px;
+        max-height: 28vh;
+    }
+    
+    .fighter-panel {
+        padding: 8px 6px;
+        gap: 4px;
+        border-radius: 10px;
+    }
+    
+    .avatar-frame {
+        width: 68px;
+        height: 68px;
+        min-width: 68px;
+        min-height: 68px;
+    }
+    
+    .fighter-info h4 {
+        font-size: 0.8rem;
+    }
+    
+    .hp-text {
+        font-size: 0.65rem;
+    }
+    
+    .timer-container {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .timer-text {
+        font-size: 1.3rem;
+    }
+    
+    .clash-center {
+        width: 80px;
+    }
+    
+    .magic-console {
+        height: 34px;
+        min-height: 34px;
+        border-radius: 8px;
+    }
+    
+    .magic-console p {
+        font-size: 0.75rem;
+    }
+    
+    /* Questions section on mobile */
+    .question-board {
+        padding: 10px;
+        height: 48vh;
+        max-height: 48vh;
+        gap: 6px;
+    }
+    
+    .question-tracker, .multiplier-badge {
+        font-size: 0.7rem;
+    }
+    
+    .question-text {
+        font-size: 0.95rem;
+        line-height: 1.3;
+    }
+    
+    /* 2x2 stays 2x2 but highly compact */
+    .options-grid {
+        height: 92px;
+        min-height: 92px;
+        gap: 6px;
+    }
+    
+    .option-btn {
+        font-size: 0.75rem;
+        padding: 0 10px;
+        border-radius: 8px;
+        gap: 6px;
+    }
+    
+    .option-btn .shortcut {
+        display: none; /* Cache les raccourcis clavier sur mobile pour libérer de la place */
+    }
+}
+
+@media (max-height: 620px) {
+    /* Optimisation supplémentaire pour les téléphones en mode paysage ou écrans très courts */
+    .avatar-frame {
+        width: 54px;
+        height: 54px;
+        min-width: 54px;
+        min-height: 54px;
+    }
+    .fighter-panel {
+        padding: 4px;
+    }
+    .question-text {
+        font-size: 0.85rem;
+    }
+    .options-grid {
+        height: 80px;
+        min-height: 80px;
+    }
+}
