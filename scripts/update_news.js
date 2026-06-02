@@ -59,8 +59,8 @@ function getLatestPayload() {
     return null;
   }
 
-  // Trier par date de modification la plus récente
-  files.sort((a, b) => b.mtime - a.mtime);
+  // Trier par nom de fichier de manière décroissante pour garantir un ordre stable et robuste (indépendant des dates de checkout Git)
+  files.sort((a, b) => b.f.localeCompare(a.f));
   
   console.log(`[Cron] Payload retenu : ${files[0].f} (Chemin: ${files[0].path})`);
   return files[0].path;
