@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
+const { getBestImage, isAcceptableImage } = require('../lib/imageEngine');
 
 // =========================================================
 // Chargement .env.local
@@ -435,21 +436,10 @@ async function fetchFromWikimedia(query) {
 // Moteur principal — Chaîne de sources par priorité
 // =========================================================
 async function getExactImage(title, cat) {
-  const { query } = analyzeTitle(title, cat);
-  console.log(`[Cron Image] Recherche pour : "${title}"`);
-  console.log(`[Cron Image] Requête : "${query}" | cat: ${cat}`);
-
-  // 1. Google Custom Search API (si débloqué)
-  const googleImg = await fetchFromGoogleAPI(query);
-  if (googleImg) return googleImg;
-
-  // 2. Moteur de recherche Bing & Yahoo (100% gratuit et sans clé d'API)
-  const ddgImg = await fetchFromBingYahoo(query);
-  if (ddgImg) return ddgImg;
-
-  // null → le Story template utilise le design prestige
-  console.warn(`[Cron Image] ⚠️ Aucune image trouvée via Google pour : "${title}"`);
-  return null;
+  // Délégué au moteur unifié (lib/imageEngine.js) :
+  // Google→Bing→Yahoo→DDG filtrés par PERTINENCE + filet exact (Jikan/TMDb/Wikipedia).
+  // Mieux vaut null (fond catégorie) qu'une image hors-sujet.
+  return await getBestImage(title, cat, { log: true });
 }
 
 // =========================================================
@@ -589,7 +579,8 @@ async function run() {
     const publishedAt = item.published_at || new Date(Date.now() - i * 30 * 60 * 1000).toISOString();
 
     const forceUpdate = process.argv.includes('--force');
-    const existingImg = (!forceUpdate && item.img?.startsWith('http')) ? item.img : null;
+    // On ne garde l'image existante que si elle est ACCEPTABLE (sinon on re-résout)
+    const existingImg = (!forceUpdate && item.img?.startsWith('http') && isAcceptableImage(item.img, item.title, item.cat)) ? item.img : null;
     let img = existingImg;
 
     if (!existingImg) {

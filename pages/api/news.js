@@ -1,6 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import fs from 'fs';
 import path from 'path';
+import imageEngine from '../../lib/imageEngine.js';
+const { getBestImage } = imageEngine;
 
 // =========================================================
 const FALLBACK_NEWS = [
@@ -430,13 +432,9 @@ async function fetchFromWikimedia(query) {
 }
 
 async function getAutoImage(title, cat) {
-  const query   = buildSearchQuery(title, cat);
-
-  return (
-    await fetchFromGoogleAPI(query) ||
-    await fetchFromBingYahoo(query) ||
-    null  // null → Story template : design prestige
-  );
+  // Délégué au moteur unifié (lib/imageEngine.js) — logique IDENTIQUE au cron :
+  // Google→Bing→Yahoo→DDG filtrés par pertinence + filet exact (Jikan/TMDb/Wikipedia).
+  return await getBestImage(title, cat);
 }
 
 // =========================================================

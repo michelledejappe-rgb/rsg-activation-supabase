@@ -1,4 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
+import imageEngine from '../../lib/imageEngine.js';
+const { isAcceptableImage } = imageEngine;
 
 // =========================================================
 // Filtre de contenu anti-gaming et détection de la langue (Strictement Français)
@@ -239,6 +241,24 @@ export default async function handler(req, res) {
         uniqueTitles.add(cleanTitle);
         newsToUpsert.push(item);
       }
+    }
+
+    // 3bis. Préserver les images déjà validées en base (dont les corrections) et
+    //        ne JAMAIS réintroduire une image hors-sujet (rapide : un simple select).
+    try {
+      const { data: existingRows } = await supabase.from('news').select('title,img');
+      const existingImg = {};
+      (existingRows || []).forEach(r => { existingImg[(r.title || '').trim().toLowerCase()] = r.img; });
+      for (const item of newsToUpsert) {
+        const prev = existingImg[(item.title || '').trim().toLowerCase()];
+        if (prev && isAcceptableImage(prev, item.title, item.cat)) {
+          item.img = prev;                       // garde l'image déjà bonne (incl. réparées)
+        } else if (!isAcceptableImage(item.img, item.title, item.cat)) {
+          item.img = null;                        // jamais de hors-sujet ; /api/news comblera proprement
+        }
+      }
+    } catch (e) {
+      console.warn('[Cloud Cron] Préservation des images impossible :', e.message);
     }
 
     console.log(`[Cloud Cron] Synchronisation de ${newsToUpsert.length} actus (dont ${rssNews.length} RSS) vers Supabase...`);
