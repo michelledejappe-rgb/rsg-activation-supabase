@@ -865,7 +865,7 @@ export default function HarryPotterQuiz() {
   };
 
   const copyShareText = () => {
-    const text = `⚡ J'ai obtenu le score de ${score} points dans "Le Duel des Sorciers" sur roadsixtygeek.com ! Prêt à me défier ?`;
+    const text = `⚡ J'ai obtenu le score de ${score} points dans "Le Duel des Sorciers" sur Road Sixty Geek ! Prêt à me défier ? Relevez le défi ici : https://roadsixtygeek.com/activation`;
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text).then(() => {
         setCopiedLink(true);
@@ -896,6 +896,19 @@ export default function HarryPotterQuiz() {
         <meta name="description" content="Affrontez les sorciers légendaires de Poudlard dans ce grand duel de connaissances couvrant l'intégralité des 7 livres de la saga !" />
         <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Outfit:wght@300;400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
         <link rel="stylesheet" href="/harry-potter.css" />
+        
+        {/* Métadonnées de Partage Social (Open Graph & Twitter Card) pour la viralité */}
+        <meta property="og:title" content="Relève le Grand Concours Harry Potter | Road Sixty Geek" />
+        <meta property="og:description" content="Affrontez les sorciers légendaires de Poudlard dans ce grand duel de connaissances sur les 7 livres ! Serez-vous à la hauteur ?" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://roadsixtygeek.com/activation" />
+        <meta property="og:image" content="https://images.unsplash.com/photo-1598153346810-860daa814c4b?q=80&w=1200&auto=format&fit=crop" />
+        <meta property="og:site_name" content="Road Sixty Geek" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Relève le Grand Concours Harry Potter | Road Sixty Geek" />
+        <meta name="twitter:description" content="Affrontez les sorciers légendaires de Poudlard dans ce grand duel de connaissances sur les 7 livres ! Serez-vous à la hauteur ?" />
+        <meta name="twitter:image" content="https://images.unsplash.com/photo-1598153346810-860daa814c4b?q=80&w=1200&auto=format&fit=crop" />
       </Head>
 
       <Script 
@@ -1047,9 +1060,110 @@ export default function HarryPotterQuiz() {
                   className={`btn-glow btn-primary ${isFormValid ? '' : 'disabled'}`} 
                   onClick={startGame}
                   disabled={!isFormValid}
+                  style={{ marginBottom: '10px' }}
                 >
                   Pénétrer dans l'Arène
                 </button>
+
+                {/* Partage Social Avant de Jouer */}
+                <div className="share-preplay-container" style={{ 
+                  marginTop: '15px', 
+                  borderTop: '1px solid var(--border-glass)', 
+                  paddingTop: '12px', 
+                  textAlign: 'center' 
+                }}>
+                  <span style={{ 
+                    fontSize: '0.7rem', 
+                    textTransform: 'uppercase', 
+                    color: 'var(--color-text-muted)', 
+                    display: 'block', 
+                    marginBottom: '8px', 
+                    letterSpacing: '0.5px' 
+                  }}>
+                    📢 Partagez le défi de Poudlard !
+                  </span>
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    <a 
+                      href="https://www.facebook.com/sharer/sharer.php?u=https://roadsixtygeek.com/activation" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      style={{ 
+                        background: '#1877f2', 
+                        color: '#fff', 
+                        padding: '6px 12px', 
+                        borderRadius: '6px', 
+                        fontSize: '0.72rem', 
+                        textDecoration: 'none', 
+                        fontWeight: 'bold', 
+                        display: 'inline-flex', 
+                        alignItems: 'center', 
+                        gap: '5px' 
+                      }}
+                    >
+                      🔵 Facebook
+                    </a>
+                    <button 
+                      onClick={() => {
+                        navigator.clipboard.writeText("https://roadsixtygeek.com/activation");
+                        alert("Lien du concours copié ! Collez-le dans votre bio ou story Instagram !");
+                      }}
+                      style={{ 
+                        background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)', 
+                        color: '#fff', 
+                        border: 'none', 
+                        padding: '6px 12px', 
+                        borderRadius: '6px', 
+                        fontSize: '0.72rem', 
+                        cursor: 'pointer', 
+                        fontWeight: 'bold', 
+                        display: 'inline-flex', 
+                        alignItems: 'center', 
+                        gap: '5px' 
+                      }}
+                    >
+                      📸 Instagram
+                    </button>
+                    <a 
+                      href="https://twitter.com/intent/tweet?text=Rejoins%20le%20Grand%20Concours%20des%20Sorciers%20Harry%20Potter%20sur%20Road%20Sixty%20Geek%20!%20&url=https://roadsixtygeek.com/activation" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      style={{ 
+                        background: '#000', 
+                        color: '#fff', 
+                        padding: '6px 12px', 
+                        borderRadius: '6px', 
+                        fontSize: '0.72rem', 
+                        textDecoration: 'none', 
+                        fontWeight: 'bold', 
+                        display: 'inline-flex', 
+                        alignItems: 'center', 
+                        gap: '5px', 
+                        border: '1px solid #333' 
+                      }}
+                    >
+                      𝕏 Twitter
+                    </a>
+                    <a 
+                      href="https://api.whatsapp.com/send?text=Rejoins%20le%20Grand%20Concours%20des%20Sorciers%20Harry%20Potter%20sur%20Road%20Sixty%20Geek%20!%20https://roadsixtygeek.com/activation" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      style={{ 
+                        background: '#25d366', 
+                        color: '#fff', 
+                        padding: '6px 12px', 
+                        borderRadius: '6px', 
+                        fontSize: '0.72rem', 
+                        textDecoration: 'none', 
+                        fontWeight: 'bold', 
+                        display: 'inline-flex', 
+                        alignItems: 'center', 
+                        gap: '5px' 
+                      }}
+                    >
+                      🟢 WhatsApp
+                    </a>
+                  </div>
+                </div>
               </div>
             </section>
           )}
@@ -1227,8 +1341,8 @@ export default function HarryPotterQuiz() {
                 </h2>
                 <p id="outcome-desc" className="outcome-text">
                   {isVictoryOutcome 
-                    ? "Incroyable ! Vous avez terrassé Lord Voldemort et prouvé votre savoir sur les tomes 1 & 2 d'Harry Potter !" 
-                    : `Votre bouclier a cédé face à ${OPPONENTS[opponentId]?.name}. Replongez-vous dans les deux premiers tomes !`
+                    ? "Incroyable ! Vous avez terrassé Lord Voldemort et prouvé votre savoir sur tous les tomes d'Harry Potter !" 
+                    : `Votre bouclier a cédé face à ${OPPONENTS[opponentId]?.name}. Replongez-vous dans les livres de la saga !`
                   }
                 </p>
 
@@ -1295,11 +1409,112 @@ export default function HarryPotterQuiz() {
                   </div>
                 </div>
 
-                <div className="actions-area">
+                <div className="actions-area" style={{ marginBottom: '15px' }}>
                   <button id="btn-restart" className="btn-glow btn-primary" onClick={restartGame}>Retenter l'Aventure</button>
                   <button id="btn-share" className="btn-secondary" onClick={copyShareText}>
                     {copiedLink ? "Message copié !" : "Partager mon Titre"}
                   </button>
+                </div>
+
+                {/* Partage Social Après Partie */}
+                <div className="share-postplay-container" style={{ 
+                  marginTop: '15px', 
+                  borderTop: '1px solid var(--border-glass)', 
+                  paddingTop: '12px', 
+                  width: '100%',
+                  textAlign: 'center'
+                }}>
+                  <span style={{ 
+                    fontSize: '0.7rem', 
+                    textTransform: 'uppercase', 
+                    color: 'var(--color-text-muted)', 
+                    display: 'block', 
+                    marginBottom: '8px', 
+                    letterSpacing: '0.5px' 
+                  }}>
+                    📢 Partagez votre exploit de Sorcier !
+                  </span>
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    <a 
+                      href={`https://www.facebook.com/sharer/sharer.php?u=https://roadsixtygeek.com/activation&quote=J'ai%20obtenu%20le%20score%20de%20${score}%20points%20dans%20Le%20Duel%20des%20Sorciers%20sur%20Road%20Sixty%20Geek%20!`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      style={{ 
+                        background: '#1877f2', 
+                        color: '#fff', 
+                        padding: '6px 12px', 
+                        borderRadius: '6px', 
+                        fontSize: '0.72rem', 
+                        textDecoration: 'none', 
+                        fontWeight: 'bold', 
+                        display: 'inline-flex', 
+                        alignItems: 'center', 
+                        gap: '5px' 
+                      }}
+                    >
+                      🔵 Facebook
+                    </a>
+                    <button 
+                      onClick={() => {
+                        navigator.clipboard.writeText(`⚡ J'ai obtenu le score de ${score} points dans "Le Duel des Sorciers" sur Road Sixty Geek ! Prêt à me défier ? Relevez le défi ici : https://roadsixtygeek.com/activation`);
+                        alert("Lien et score copiés ! Collez-les dans votre bio ou story Instagram !");
+                      }}
+                      style={{ 
+                        background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)', 
+                        color: '#fff', 
+                        border: 'none', 
+                        padding: '6px 12px', 
+                        borderRadius: '6px', 
+                        fontSize: '0.72rem', 
+                        cursor: 'pointer', 
+                        fontWeight: 'bold', 
+                        display: 'inline-flex', 
+                        alignItems: 'center', 
+                        gap: '5px' 
+                      }}
+                    >
+                      📸 Instagram
+                    </button>
+                    <a 
+                      href={`https://twitter.com/intent/tweet?text=J'ai%20obtenu%20le%20score%20de%20${score}%20points%20dans%20le%20Grand%20Concours%20Harry%20Potter%20sur%20Road%20Sixty%20Geek%20!%20Prêt%20à%20me%20défier%20?%20&url=https://roadsixtygeek.com/activation`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      style={{ 
+                        background: '#000', 
+                        color: '#fff', 
+                        padding: '6px 12px', 
+                        borderRadius: '6px', 
+                        fontSize: '0.72rem', 
+                        textDecoration: 'none', 
+                        fontWeight: 'bold', 
+                        display: 'inline-flex', 
+                        alignItems: 'center', 
+                        gap: '5px', 
+                        border: '1px solid #333' 
+                      }}
+                    >
+                      𝕏 Twitter
+                    </a>
+                    <a 
+                      href={`https://api.whatsapp.com/send?text=J'ai%20obtenu%20le%20score%20de%20${score}%20points%20dans%20le%20Grand%20Concours%20Harry%20Potter%20sur%20Road%20Sixty%20Geek%20!%20Prêt%20à%20me%20défier%20?%20Rejoins%20le%20duel%20ici%20:%20https://roadsixtygeek.com/activation`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      style={{ 
+                        background: '#25d366', 
+                        color: '#fff', 
+                        padding: '6px 12px', 
+                        borderRadius: '6px', 
+                        fontSize: '0.72rem', 
+                        textDecoration: 'none', 
+                        fontWeight: 'bold', 
+                        display: 'inline-flex', 
+                        alignItems: 'center', 
+                        gap: '5px' 
+                      }}
+                    >
+                      🟢 WhatsApp
+                    </a>
+                  </div>
                 </div>
               </div>
             </section>
