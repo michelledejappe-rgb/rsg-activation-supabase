@@ -5,7 +5,7 @@ on:
     branches:
       - main
   schedule:
-    - cron: '0 6,10,16 * * *' # S'exécute à 8h, 12h et 18h (heure de Bruxelles - CEST / UTC+2)
+    - cron: '0 6,10,16,18 * * *' # S'exécute à 8h, 12h, 18h et 20h (heure de Bruxelles - CEST / UTC+2)
   workflow_dispatch: # Permet de déclencher la synchronisation d'un simple clic sur GitHub
 
 jobs:

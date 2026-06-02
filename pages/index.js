@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import { slugify } from '../lib/slug';
 
 export default function Home() {
   const [news, setNews] = useState([]);
@@ -22,6 +23,27 @@ export default function Home() {
   const [selectedSticker, setSelectedSticker] = useState('hype');
   const [generatingStory, setGeneratingStory] = useState(false);
   const [storyImageUrl, setStoryImageUrl] = useState(null);
+  const [copiedLink, setCopiedLink] = useState(false);
+
+  // Copier l'URL propre de l'article (pour les liens "lire la suite" en story)
+  const fallbackCopy = (text, done) => {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta); done();
+    } catch (e) { /* silencieux */ }
+  };
+  const copyArticleLink = () => {
+    if (!activeNewsItem) return;
+    const link = `https://roadsixtygeek.com/actu/${slugify(activeNewsItem.title)}`;
+    const done = () => { setCopiedLink(true); setTimeout(() => setCopiedLink(false), 2000); };
+    if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(link).then(done).catch(() => fallbackCopy(link, done));
+    } else {
+      fallbackCopy(link, done);
+    }
+  };
 
   const [trends, setTrends] = useState([
     { name: 'One Piece (Arc Elbaph)', value: 0, target: 94 },
@@ -325,7 +347,7 @@ export default function Home() {
     <div className="min-h-screen bg-black text-white relative">
       <Head>
         <title>Road Sixty Geek (QG) — Actu Pop Culture, Mangas & Licences</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="description" content="Découvrez toute l'actualité pop culture, mangas, animes, cinéma et les collabs de marque les plus folles !" />
         <link rel="icon" href="/favicon.ico" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -700,7 +722,17 @@ export default function Home() {
               <span className="modal-date">{getDisplayTime(activeNewsItem)}</span>
             </div>
             <h2 className="modal-title">{activeNewsItem.title}</h2>
-            
+
+            {/* Lien propre de l'article — pour le coller dans une story "lire la suite" */}
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', margin: '2px 0 10px' }}>
+              <button onClick={copyArticleLink} className="play-quiz-btn" style={{ fontSize: '0.78rem', padding: '7px 12px' }}>
+                {copiedLink ? '✅ Lien copié !' : "🔗 Copier le lien de l'article"}
+              </button>
+              <a href={`/actu/${slugify(activeNewsItem.title)}`} target="_blank" rel="noopener noreferrer" className="play-quiz-btn" style={{ fontSize: '0.78rem', padding: '7px 12px', textDecoration: 'none', background: 'var(--bg-glass)', color: 'var(--color-dark)' }}>
+                ↗ Voir la page
+              </a>
+            </div>
+
             {/* Visual background placeholder banner in modal */}
             <div 
               className="modal-banner" 
