@@ -31,18 +31,39 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // =========================================================
-// Lecture du payload le plus récent
+// Lecture du payload le plus récent (Recherche hybride)
 // =========================================================
 function getLatestPayload() {
-  const dir = path.join(__dirname, '../..');
-  if (!fs.existsSync(dir)) return null;
-  const files = fs.readdirSync(dir)
-    .filter(f => f.startsWith('_qg_payload_') && f.endsWith('.json'))
-    .map(f => ({ f, mtime: fs.statSync(path.join(dir, f)).mtimeMs }))
-    .sort((a, b) => b.mtime - a.mtime);
-  if (!files.length) { console.warn('[Cron] Aucun payload trouvé.'); return null; }
-  console.log(`[Cron] Payload : ${files[0].f}`);
-  return path.join(dir, files[0].f);
+  let files = [];
+
+  // 1. Recherche dans la racine du projet (idéal pour GitHub Actions et dépôts propres)
+  const projectRoot = path.join(__dirname, '..');
+  if (fs.existsSync(projectRoot)) {
+    const projectFiles = fs.readdirSync(projectRoot)
+      .filter(f => f.startsWith('_qg_payload_') && f.endsWith('.json'))
+      .map(f => ({ path: path.join(projectRoot, f), f, mtime: fs.statSync(path.join(projectRoot, f)).mtimeMs }));
+    files = [...files, ...projectFiles];
+  }
+
+  // 2. Recherche dans le dossier parent (Downloads local) pour compatibilité historique
+  const parentDir = path.join(__dirname, '../..');
+  if (fs.existsSync(parentDir)) {
+    const parentFiles = fs.readdirSync(parentDir)
+      .filter(f => f.startsWith('_qg_payload_') && f.endsWith('.json'))
+      .map(f => ({ path: path.join(parentDir, f), f, mtime: fs.statSync(path.join(parentDir, f)).mtimeMs }));
+    files = [...files, ...parentFiles];
+  }
+
+  if (!files.length) {
+    console.warn('[Cron] Aucun payload trouvé.');
+    return null;
+  }
+
+  // Trier par date de modification la plus récente
+  files.sort((a, b) => b.mtime - a.mtime);
+  
+  console.log(`[Cron] Payload retenu : ${files[0].f} (Chemin: ${files[0].path})`);
+  return files[0].path;
 }
 
 // =========================================================
