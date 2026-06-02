@@ -1,13 +1,58 @@
 import { createClient } from '@supabase/supabase-js';
 
 // =========================================================
+// Filtre de contenu anti-gaming et détection de la langue (Strictement Français)
+// =========================================================
+function shouldKeepArticle(title, text) {
+  const t = (title || "").toLowerCase();
+  const d = (text || "").toLowerCase();
+
+  // 1. Anti-Gaming Filter
+  const gamingWords = [
+    'jeu vidéo', 'jeux vidéo', 'gaming', 'playstation', 'ps5', 'xbox', 'nintendo', 
+    'switch', 'console', 'gameplay', 'rockstar', 'gta', 'gta 6', 'fifa', 'fortnite', 
+    'gamers', 'cyberpunk 2077', 'pc gamer', 'resident evil', 'call of duty', 
+    'assassin\'s creed', 'gamer', 'jeux-video', 'jeu-video'
+  ];
+  for (const word of gamingWords) {
+    if (t.includes(word) || d.includes(word)) {
+      return false;
+    }
+  }
+
+  // 2. English Detection Filter (Strict French Only)
+  const englishStopwords = [
+    ' the ', ' is ', ' for ', ' in ', ' with ', ' at ', ' on ', ' and ', ' of ', ' to ', 
+    ' from ', ' this ', ' that ', ' under ', ' with ', ' about '
+  ];
+  for (const word of englishStopwords) {
+    if (t.includes(word) || d.includes(word)) {
+      return false;
+    }
+  }
+
+  // Termes anglais fréquents dans les collabs / drops
+  const englishTerms = [
+    'release date', 'official trailer', 'announces', 'unveils', 'collaboration info', 
+    'exclusive drop', 'collection release'
+  ];
+  for (const word of englishTerms) {
+    if (t.includes(word) || d.includes(word)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+// =========================================================
 // Récupération des flux de presse RSS (Actualisation 100% autonome sans fichiers)
 // =========================================================
 async function fetchRSSNews() {
   const feeds = [
     { url: "https://www.manga-news.com/index.php/feed/news", cat: "manga", defaultEmoji: "📖" },
     { url: "https://www.allocine.fr/rss/news.xml", cat: "cine", defaultEmoji: "🎬" },
-    { url: "https://hypebeast.com/feed", cat: "collab", defaultEmoji: "🧸" }
+    { url: "https://www.sneakers.fr/feed/", cat: "collab", defaultEmoji: "🧸" }
   ];
   
   const rssNews = [];
@@ -57,7 +102,7 @@ async function fetchRSSNews() {
         
         // Formater date_str
         const dayStr = new Date(pubDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
-        const sourceLabel = feed.url.includes('allocine') ? 'AlloCiné' : feed.url.includes('manga-news') ? 'MangaNews' : 'Hypebeast';
+        const sourceLabel = feed.url.includes('allocine') ? 'AlloCiné' : feed.url.includes('manga-news') ? 'MangaNews' : 'Sneakers.fr';
         
         rssNews.push({
           cat: feed.cat,
@@ -183,6 +228,12 @@ export default async function handler(req, res) {
     const newsToUpsert = [];
     for (const item of allNewsRaw) {
       if (!item.title) continue;
+      
+      // Filtrer les actualités gaming et anglaises
+      if (!shouldKeepArticle(item.title, item.text)) {
+        continue;
+      }
+
       const cleanTitle = item.title.trim().toLowerCase();
       if (!uniqueTitles.has(cleanTitle)) {
         uniqueTitles.add(cleanTitle);

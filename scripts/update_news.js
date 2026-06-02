@@ -31,6 +31,51 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // =========================================================
+// Filtre de contenu anti-gaming et détection de la langue (Strictement Français)
+// =========================================================
+function shouldKeepArticle(title, text) {
+  const t = (title || "").toLowerCase();
+  const d = (text || "").toLowerCase();
+
+  // 1. Anti-Gaming Filter
+  const gamingWords = [
+    'jeu vidéo', 'jeux vidéo', 'gaming', 'playstation', 'ps5', 'xbox', 'nintendo', 
+    'switch', 'console', 'gameplay', 'rockstar', 'gta', 'gta 6', 'fifa', 'fortnite', 
+    'gamers', 'cyberpunk 2077', 'pc gamer', 'resident evil', 'call of duty', 
+    'assassin\'s creed', 'gamer', 'jeux-video', 'jeu-video'
+  ];
+  for (const word of gamingWords) {
+    if (t.includes(word) || d.includes(word)) {
+      return false;
+    }
+  }
+
+  // 2. English Detection Filter (Strict French Only)
+  const englishStopwords = [
+    ' the ', ' is ', ' for ', ' in ', ' with ', ' at ', ' on ', ' and ', ' of ', ' to ', 
+    ' from ', ' this ', ' that ', ' under ', ' with ', ' about '
+  ];
+  for (const word of englishStopwords) {
+    if (t.includes(word) || d.includes(word)) {
+      return false;
+    }
+  }
+
+  // Termes anglais fréquents dans les collabs / drops
+  const englishTerms = [
+    'release date', 'official trailer', 'announces', 'unveils', 'collaboration info', 
+    'exclusive drop', 'collection release'
+  ];
+  for (const word of englishTerms) {
+    if (t.includes(word) || d.includes(word)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+// =========================================================
 // Lecture du payload le plus récent (Recherche hybride)
 // =========================================================
 function getLatestPayload() {
@@ -81,21 +126,47 @@ function analyzeTitle(title, cat) {
   // On cherche les noms propres et franchises connues
   let entity = null;
   const knownEntities = [
-    'G-SHOCK', 'Casio', 'Gundam', 'RX-78-2',
-    'LEGO', 'Minas Tirith', 'Lord of the Rings',
-    'Demon Slayer', 'Kimetsu no Yaiba', 'Mitsuri', 'Infinity Castle',
-    'My Hero Academia', 'Jujutsu Kaisen', 'Frieren',
-    'Blue Lock', 'Shangri-La Frontier', 'My Dress-Up Darling',
-    'Toy Story', 'Spider-Man', 'Cannes', 'Japan Expo',
-    'Funko', 'Winnie', 'Pop Mart', 'adidas', 'Uniqlo',
-    'Seven Seas', 'Crunchyroll', 'Netflix', 'Solo Leveling'
+    'G-SHOCK', 'Casio', 'Gundam', 'RX-78-2', 'LEGO', 'Minas Tirith', 'Lord of the Rings',
+    'Demon Slayer', 'Kimetsu no Yaiba', 'Mitsuri', 'Infinity Castle', 'My Hero Academia', 
+    'Jujutsu Kaisen', 'Frieren', 'Blue Lock', 'Shangri-La Frontier', 'My Dress-Up Darling',
+    'Toy Story', 'Spider-Man', 'Cannes', 'Japan Expo', 'Funko', 'Winnie', 'Pop Mart', 
+    'adidas', 'Uniqlo', 'Seven Seas', 'Crunchyroll', 'Netflix', 'Solo Leveling',
+    'Dragon Quest', 'Hunter x Hunter', 'Noces des lucioles', 'One Piece', 'Chainsaw Man',
+    'Bleach', 'Naruto', 'Dragon Ball'
   ];
   for (const e of knownEntities) {
     if (t.includes(e.toLowerCase())) { entity = e; break; }
   }
 
-  // Construction de la requête de recherche
-  let query = entity || title.split(/[,:–]/).shift().trim();
+  // Construction de la requête de recherche robuste
+  let query = entity;
+  if (!query) {
+    // Si des guillemets sont présents, on extrait le titre de l'œuvre
+    const quoteMatch = title.match(/[«"“]([^»"”]+)[»"”]/);
+    if (quoteMatch) {
+      query = quoteMatch[1].trim();
+    } else {
+      // Nettoyage générique de verbes et mots de liaison
+      query = title
+        .replace(/^.{0,80}?(dévoile|annonce|lance|publie|présente|sort|rejoint|s['']associe (aux?|à)|entre dans|est disponible|bat|rafle|maintient\s+sa?\s+|sacré|clap de fin pour|marque un|ouvre|offre)\s+/i, '')
+        .split(/[,:–-]/).shift().trim();
+      
+      // Si la requête est encore trop longue, on ne prend que les 4 premiers mots significatifs
+      const words = query.split(/\s+/);
+      if (words.length > 5) {
+        query = words.slice(0, 4).join(' ');
+      }
+    }
+  }
+
+  // Ajouter un suffixe selon la catégorie pour guider le moteur d'images
+  if (cat === 'manga' && !query.toLowerCase().includes('manga')) {
+    query += ' manga';
+  } else if (cat === 'cine' && !query.toLowerCase().includes('film') && !query.toLowerCase().includes('movie')) {
+    query += ' movie poster';
+  } else if (cat === 'collab' && !query.toLowerCase().includes('sneaker') && !query.toLowerCase().includes('collab')) {
+    query += ' sneakers';
+  }
 
   // Spécialisation par contexte
   if (t.includes('goldorak') || t.includes('grendizer')) query = 'Casio G-Shock Goldorak U GA-110 Grendizer watch';
@@ -391,7 +462,7 @@ async function fetchRSSNews() {
   const feeds = [
     { url: "https://www.manga-news.com/index.php/feed/news", cat: "manga", defaultEmoji: "📖" },
     { url: "https://www.allocine.fr/rss/news.xml", cat: "cine", defaultEmoji: "🎬" },
-    { url: "https://hypebeast.com/feed", cat: "collab", defaultEmoji: "🧸" }
+    { url: "https://www.sneakers.fr/feed/", cat: "collab", defaultEmoji: "🧸" }
   ];
   
   const rssNews = [];
@@ -441,7 +512,7 @@ async function fetchRSSNews() {
         
         // Formater date_str
         const dayStr = new Date(pubDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
-        const sourceLabel = feed.url.includes('allocine') ? 'AlloCiné' : feed.url.includes('manga-news') ? 'MangaNews' : 'Hypebeast';
+        const sourceLabel = feed.url.includes('allocine') ? 'AlloCiné' : feed.url.includes('manga-news') ? 'MangaNews' : 'Sneakers.fr';
         
         rssNews.push({
           cat: feed.cat,
@@ -497,6 +568,12 @@ async function run() {
   const allNewsFiltered = [];
   for (const item of allNewsRaw) {
     if (!item.title) continue;
+
+    // Filtrer les actualités gaming et anglaises
+    if (!shouldKeepArticle(item.title, item.text)) {
+      continue;
+    }
+
     const cleanTitle = item.title.trim().toLowerCase();
     if (!uniqueTitles.has(cleanTitle)) {
       uniqueTitles.add(cleanTitle);
@@ -539,7 +616,7 @@ async function run() {
   if (payloadPath) {
     try {
       const payload = JSON.parse(fs.readFileSync(payloadPath, 'utf8'));
-      fs.writeFileSync(payloadPath, JSON.stringify({ ...payload, news: newsToUpsert.filter(n => !n.date_str.includes('AlloCiné') && !n.date_str.includes('MangaNews') && !n.date_str.includes('Hypebeast')) }, null, 2));
+      fs.writeFileSync(payloadPath, JSON.stringify({ ...payload, news: newsToUpsert.filter(n => !n.date_str.includes('AlloCiné') && !n.date_str.includes('MangaNews') && !n.date_str.includes('Sneakers.fr')) }, null, 2));
       console.log(`\n[Cron] Payload local mis à jour.`);
     } catch (e) {
       console.error('[Cron] Erreur écriture payload :', e.message);

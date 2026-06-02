@@ -210,13 +210,9 @@ const FALLBACK_NEWS = [
 // =========================================================
 
 function buildSearchQuery(title, cat) {
-  let q = title
-    .replace(/^.{0,80}?(dévoile|annonce|lance|publie|présente|sort|rejoint|s['']associe (aux?|à)|entre dans|est disponible|bat|rafle|maintient\s+sa?\s+|sacré|clap de fin pour|marque un|ouvre)\s+/i, '')
-    .trim();
-
   const lower = title.toLowerCase();
 
-  // Enrichissements contextuels basés sur le contenu du titre
+  // 1. Spécialisation par contexte (overrides existants...)
   if (lower.includes('goldorak') || lower.includes('grendizer')) return 'Casio G-Shock Goldorak U GA-110 Grendizer watch official';
   if (lower.includes('g-shock') || (lower.includes('casio') && lower.includes('gundam'))) return 'Casio G-SHOCK Gundam RX-78-2 DW-5600 2026 watch official photo';
   if (lower.includes('minas tirith') || (lower.includes('lego') && lower.includes('lord')))  return 'LEGO Minas Tirith 11377 Lord of the Rings set official product 2026';
@@ -238,7 +234,38 @@ function buildSearchQuery(title, cat) {
   if (lower.includes('japan expo'))                                                           return 'Japan Expo Paris 2026 salon officiel affiche manga anime';
   if (lower.includes('seven seas'))                                                           return 'Seven Seas Entertainment manga publisher 2026 new license';
 
-  // Enrichissement générique par catégorie
+  // 2. Extraction robuste si pas d'override
+  let entity = null;
+  const knownEntities = [
+    'G-SHOCK', 'Casio', 'Gundam', 'RX-78-2', 'LEGO', 'Minas Tirith', 'Lord of the Rings',
+    'Demon Slayer', 'Kimetsu no Yaiba', 'Mitsuri', 'Infinity Castle', 'My Hero Academia', 
+    'Jujutsu Kaisen', 'Frieren', 'Blue Lock', 'Shangri-La Frontier', 'My Dress-Up Darling',
+    'Toy Story', 'Spider-Man', 'Cannes', 'Japan Expo', 'Funko', 'Winnie', 'Pop Mart', 
+    'adidas', 'Uniqlo', 'Seven Seas', 'Crunchyroll', 'Netflix', 'Solo Leveling',
+    'Dragon Quest', 'Hunter x Hunter', 'Noces des lucioles', 'One Piece', 'Chainsaw Man',
+    'Bleach', 'Naruto', 'Dragon Ball'
+  ];
+  for (const e of knownEntities) {
+    if (lower.includes(e.toLowerCase())) { entity = e; break; }
+  }
+
+  let q = entity;
+  if (!q) {
+    const quoteMatch = title.match(/[«"“]([^»"”]+)[»"”]/);
+    if (quoteMatch) {
+      q = quoteMatch[1].trim();
+    } else {
+      q = title
+        .replace(/^.{0,80}?(dévoile|annonce|lance|publie|présente|sort|rejoint|s['']associe (aux?|à)|entre dans|est disponible|bat|rafle|maintient\s+sa?\s+|sacré|clap de fin pour|marque un|ouvre|offre)\s+/i, '')
+        .split(/[,:–-]/).shift().trim();
+      
+      const words = q.split(/\s+/);
+      if (words.length > 5) {
+        q = words.slice(0, 4).join(' ');
+      }
+    }
+  }
+
   const catSuffix = { cine:'official movie poster', series:'anime official poster', anime:'anime key visual', manga:'manga cover official', collab:'official product photo' };
   return `${q} ${catSuffix[cat] || 'official image'}`;
 }

@@ -3,16 +3,6 @@
   "news": [
     {
       "cat": "collab",
-      "emoji": "🏰",
-      "date_str": "1er Juin 2026 · Retail",
-      "title": "LEGO lance Minas Tirith en avant-première Insiders ce 1er juin",
-      "text": "LEGO ouvre ce matin les ventes de son set Lord of the Rings 'Minas Tirith' (11 377 pièces) pour ses membres Insiders. Le set exclusif promotionnel 'Grond' offert suscite une ruée sans précédent chez les collectionneurs adultes. Ruptures de stocks attendues avant ce soir en ligne.",
-      "hot": true,
-      "img": "https://bricks-radar.com/wp-content/uploads/2026/03/lego-minas-tirith-set-leak.jpg",
-      "published_at": "2026-06-01T16:16:58.778Z"
-    },
-    {
-      "cat": "collab",
       "emoji": "👕",
       "date_str": "1er Juin 2026 · Streetwear",
       "title": "Uniqlo UT dévoile sa Vague 3 Shueisha (Bleach, SPY x FAMILY, Mashle)",
@@ -32,16 +22,6 @@
       "published_at": "2026-06-01T15:16:58.807Z"
     },
     {
-      "cat": "series",
-      "emoji": "🚇",
-      "date_str": "1er Juin 2026 · Streaming",
-      "title": "Le film Milky☆Subway : The Galactic Limited Express rejoint Netflix",
-      "text": "Netflix surprend la fanbase de science-fiction rétro en ajoutant ce 1er juin le long-métrage Milky☆Subway. Une arrivée stratégique pour la plateforme qui continue de muscler ses droits exclusifs face à la concurrence de Crunchyroll.",
-      "hot": false,
-      "img": "https://image.tmdb.org/t/p/original/uRQalzrXA5OTI6dDDi4eqrpIzbN.jpg",
-      "published_at": "2026-06-01T14:46:58.808Z"
-    },
-    {
       "cat": "manga",
       "emoji": "💔",
       "date_str": "31 Mai 2026 · Édition",
@@ -50,16 +30,6 @@
       "hot": false,
       "img": "https://static.planetebd.com/dynamicImages/album/cover/large/59/57/album-cover-large-59571.jpg",
       "published_at": "2026-06-01T14:16:58.809Z"
-    },
-    {
-      "cat": "series",
-      "emoji": "🏆",
-      "date_str": "30 Mai 2026 · Tokyo",
-      "title": "My Hero Academia bat Solo Leveling et rafle l'Anime of the Year 2026",
-      "text": "La conclusion de la saga MHA a été couronnée reine de l'année aux Crunchyroll Anime Awards à Tokyo suite à un vote record de 73 millions de fans. Une consécration commerciale ultime pour la franchise de Shueisha et ses licenciés.",
-      "hot": true,
-      "img": "https://cdn.anime-planet.com/anime/primary/my-hero-academia-final-season-1.webp?t=1728743673",
-      "published_at": "2026-06-01T13:46:58.809Z"
     },
     {
       "cat": "cine",
@@ -100,16 +70,6 @@
       "hot": false,
       "img": "https://m.media-amazon.com/images/I/71rH-HH8egL._AC_SL1500_.jpg",
       "published_at": "2026-06-01T11:46:58.812Z"
-    },
-    {
-      "cat": "anime",
-      "emoji": "🪚",
-      "date_str": "1er Juin 2026 · Streaming",
-      "title": "Shangri-La Frontier Saison 2 démarre sur Crunchyroll et Netflix",
-      "text": "La saison 2 de l'anime phénomène sur le gaming en VR débute ce lundi 1er juin en simulcast mondial. Un événement streaming majeur qui dynamise déjà les ventes de figurines articulées Bandai Spirits dans les réseaux spécialisés et de grande distribution.",
-      "hot": false,
-      "img": "https://static.animecorner.me/2024/09/1726149680-ba54301e4c97ada7764e8f9816c8a46e.jpg",
-      "published_at": "2026-06-01T11:16:58.813Z"
     },
     {
       "cat": "manga",
