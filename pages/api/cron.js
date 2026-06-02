@@ -1,8 +1,90 @@
 import { createClient } from '@supabase/supabase-js';
 
+// =========================================================
+// Récupération des flux de presse RSS (Actualisation 100% autonome sans fichiers)
+// =========================================================
+async function fetchRSSNews() {
+  const feeds = [
+    { url: "https://www.manga-news.com/index.php/feed/news", cat: "manga", defaultEmoji: "📖" },
+    { url: "https://www.allocine.fr/rss/news.xml", cat: "cine", defaultEmoji: "🎬" },
+    { url: "https://hypebeast.com/feed", cat: "collab", defaultEmoji: "🧸" }
+  ];
+  
+  const rssNews = [];
+  console.log("[RSS] Récupération des actualités en direct des flux de presse...");
+  
+  for (const feed of feeds) {
+    try {
+      const res = await fetch(feed.url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+        },
+        signal: AbortSignal.timeout(6000)
+      });
+      if (!res.ok) continue;
+      
+      const xml = await res.text();
+      const itemRegex = /<item>([\s\S]*?)<\/item>/g;
+      let match;
+      let count = 0;
+      
+      while ((match = itemRegex.exec(xml)) !== null && count < 6) {
+        const itemContent = match[1];
+        
+        const titleMatch = itemContent.match(/<title>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>/);
+        const descMatch = itemContent.match(/<description>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/description>/);
+        const linkMatch = itemContent.match(/<link>([\s\S]*?)<\/link>/);
+        const pubDateMatch = itemContent.match(/<pubDate>([\s\S]*?)<\/pubDate>/);
+        
+        let img = null;
+        const enclosureMatch = itemContent.match(/<enclosure[^>]+url=["'](https?:\/\/[^"']+)["']/);
+        const mediaMatch = itemContent.match(/<media:content[^>]+url=["'](https?:\/\/[^"']+)["']/);
+        
+        if (enclosureMatch) img = enclosureMatch[1];
+        else if (mediaMatch) img = mediaMatch[1];
+        else if (descMatch) {
+          const imgInDesc = descMatch[1].match(/<img[^>]+src=["'](https?:\/\/[^"']+)["']/);
+          if (imgInDesc) img = imgInDesc[1];
+        }
+        
+        const title = titleMatch ? titleMatch[1].trim().replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/<!\[CDATA\[|\]\]>/g, '') : '';
+        let desc = descMatch ? descMatch[1].trim().replace(/<[^>]*>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/<!\[CDATA\[|\]\]>/g, '') : '';
+        if (desc.length > 250) desc = desc.slice(0, 247) + '...';
+        
+        if (!title || !desc) continue;
+        
+        const pubDate = pubDateMatch ? new Date(pubDateMatch[1].trim()).toISOString() : new Date().toISOString();
+        
+        // Formater date_str
+        const dayStr = new Date(pubDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+        const sourceLabel = feed.url.includes('allocine') ? 'AlloCiné' : feed.url.includes('manga-news') ? 'MangaNews' : 'Hypebeast';
+        
+        rssNews.push({
+          cat: feed.cat,
+          emoji: feed.defaultEmoji,
+          date_str: `${dayStr} · ${sourceLabel}`,
+          title: title.slice(0, 150),
+          text: desc,
+          hot: count === 0,
+          img: img || null,
+          published_at: pubDate
+        });
+        count++;
+      }
+    } catch (e) {
+      console.warn(`[RSS] Impossible de lire le flux ${feed.url}: ${e.message}`);
+    }
+  }
+  
+  console.log(`[RSS] ${rssNews.length} actualités presse récupérées avec succès !`);
+  return rssNews;
+}
+
+// =========================================================
+// Handler principal du Cron
+// =========================================================
 export default async function handler(req, res) {
   // 1. Protection contre les appels malveillants/abusifs
-  // En production, Vercel ajoute un en-tête d'autorisation contenant le CRON_SECRET sécurisé.
   if (process.env.NODE_ENV === 'production') {
     const authHeader = req.headers.authorization;
     if (!authHeader || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -11,7 +93,6 @@ export default async function handler(req, res) {
   }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  // On préfère la clé de rôle de service en écriture pour contourner les blocages RLS
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
@@ -24,87 +105,92 @@ export default async function handler(req, res) {
   const supabase = createClient(supabaseUrl, supabaseKey);
   const githubRepo = "michelledejappe-rgb/rsg-activation-supabase";
   
+  let payloadNews = [];
+  let latestFileName = "Aucun";
+
   try {
     console.log(`[Cloud Cron] Récupération des fichiers du dépôt : ${githubRepo}`);
     
-    // Configurer les en-têtes pour l'API GitHub
     const headers = {
       'User-Agent': 'RSG-QG-Cloud-Cron'
     };
     
-    // Si un jeton GitHub est configuré pour un dépôt privé, l'utiliser
     if (process.env.GITHUB_TOKEN) {
       headers['Authorization'] = `token ${process.env.GITHUB_TOKEN}`;
     }
 
-    // 2. Appeler l'API GitHub pour lister les fichiers à la racine
+    // Appeler l'API GitHub pour lister les fichiers à la racine
     const filesRes = await fetch(`https://api.github.com/repos/${githubRepo}/contents/`, { headers });
     
-    if (!filesRes.ok) {
-      const errText = await filesRes.text();
-      throw new Error(`Erreur API GitHub (${filesRes.status}) : ${errText}`);
+    if (filesRes.ok) {
+      const files = await filesRes.json();
+      
+      if (Array.isArray(files)) {
+        const payloadFiles = files
+          .filter(file => file.name.startsWith('_qg_payload_') && file.name.endsWith('.json'))
+          .map(file => ({
+            name: file.name,
+            downloadUrl: file.download_url
+          }));
+
+        if (payloadFiles.length > 0) {
+          payloadFiles.sort((a, b) => b.name.localeCompare(a.name));
+          const latestFile = payloadFiles[0];
+          latestFileName = latestFile.name;
+          
+          console.log(`[Cloud Cron] Téléchargement du payload : ${latestFile.name}`);
+          const downloadRes = await fetch(latestFile.downloadUrl, { headers });
+          if (downloadRes.ok) {
+            const payload = await downloadRes.json();
+            if (payload.news && Array.isArray(payload.news)) {
+              payloadNews = payload.news.map((item, index) => {
+                const now = new Date();
+                const publishedAt = item.published_at || new Date(now.getTime() - index * 30 * 60 * 1000).toISOString();
+                return {
+                  cat: item.cat || 'cine',
+                  emoji: item.emoji || '📰',
+                  date_str: item.date_str || item.date || 'Récemment',
+                  title: item.title,
+                  text: item.text,
+                  hot: !!item.hot,
+                  img: item.img || null,
+                  published_at: publishedAt
+                };
+              });
+            }
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("[Cloud Cron] Impossible de récupérer le payload GitHub, repli sur le flux RSS seul :", err.message);
+  }
+
+  try {
+    // 2. Récupérer les actualités de presse RSS
+    let rssNews = [];
+    try {
+      rssNews = await fetchRSSNews();
+    } catch (e) {
+      console.error("[Cloud Cron] Échec lecture flux RSS :", e.message);
     }
 
-    const files = await filesRes.json();
+    // 3. Fusionner les actualités
+    const allNewsRaw = [...rssNews, ...payloadNews];
     
-    if (!Array.isArray(files)) {
-      throw new Error("L'API GitHub n'a pas retourné une liste de fichiers valide.");
+    // Dédoublonner par titre
+    const uniqueTitles = new Set();
+    const newsToUpsert = [];
+    for (const item of allNewsRaw) {
+      if (!item.title) continue;
+      const cleanTitle = item.title.trim().toLowerCase();
+      if (!uniqueTitles.has(cleanTitle)) {
+        uniqueTitles.add(cleanTitle);
+        newsToUpsert.push(item);
+      }
     }
 
-    // Filtrer pour trouver les fichiers de type _qg_payload_*.json
-    const payloadFiles = files
-      .filter(file => file.name.startsWith('_qg_payload_') && file.name.endsWith('.json'))
-      .map(file => ({
-        name: file.name,
-        downloadUrl: file.download_url
-      }));
-
-    if (payloadFiles.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "Aucun fichier de type _qg_payload_*.json trouvé dans le dépôt GitHub."
-      });
-    }
-
-    // Trier les fichiers par nom de manière alphabétique décroissante (les dates dans les noms trient le plus récent en premier)
-    // Exemple : _qg_payload_20260526.json > _qg_payload_20260524.json
-    payloadFiles.sort((a, b) => b.name.localeCompare(a.name));
-    
-    const latestFile = payloadFiles[0];
-    console.log(`[Cloud Cron] Fichier payload sélectionné : ${latestFile.name}`);
-
-    // 3. Télécharger le contenu du fichier sélectionné
-    const downloadRes = await fetch(latestFile.downloadUrl, { headers });
-    if (!downloadRes.ok) {
-      throw new Error(`Impossible de télécharger le contenu du fichier depuis GitHub.`);
-    }
-
-    const payload = await downloadRes.json();
-
-    if (!payload.news || !Array.isArray(payload.news)) {
-      throw new Error("Le format du payload JSON n'est pas valide (tableau 'news' manquant).");
-    }
-
-    console.log(`[Cloud Cron] Traitement de ${payload.news.length} actualités...`);
-
-    // Préparer les données avec étalement temporel pour simuler une activité dynamique récente
-    const newsToUpsert = payload.news.map((item, index) => {
-      const now = new Date();
-      const publishedAt = new Date(now.getTime() - index * 30 * 60 * 1000); // 30 minutes de décalage chronologique
-
-      return {
-        cat: item.cat || 'cine',
-        emoji: item.emoji || '📰',
-        date_str: item.date || 'Récemment',
-        title: item.title,
-        text: item.text,
-        hot: !!item.hot,
-        img: item.img || null, // Préservation de l'image de produit exacte extraite par le Cron
-        published_at: publishedAt.toISOString()
-      };
-    });
-
-    console.log("[Cloud Cron] Synchronisation en cours vers Supabase...");
+    console.log(`[Cloud Cron] Synchronisation de ${newsToUpsert.length} actus (dont ${rssNews.length} RSS) vers Supabase...`);
 
     // 4. Effectuer l'upsert dans Supabase
     const { error } = await supabase
@@ -119,8 +205,8 @@ export default async function handler(req, res) {
     
     return res.status(200).json({
       success: true,
-      message: `Synchronisation réussie depuis le fichier ${latestFile.name}`,
-      items_count: newsToUpsert.length
+      message: `Synchronisation réussie. Payload: ${latestFileName}. RSS actus: ${rssNews.length}.`,
+      total_items: newsToUpsert.length
     });
 
   } catch (err) {
