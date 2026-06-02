@@ -99,6 +99,7 @@ export default async function handler(req, res) {
         title: item.title,
         text: item.text,
         hot: !!item.hot,
+        img: item.img || null, // Préservation de l'image de produit exacte extraite par le Cron
         published_at: publishedAt.toISOString()
       };
     });
