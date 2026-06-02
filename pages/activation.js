@@ -886,8 +886,6 @@ export default function HarryPotterQuiz() {
   const pct = timeRemaining / 15;
   const offsetValue = 201.0 - (pct * 201.0);
 
-  if (!mounted) return null;
-
   return (
     <>
       <Head>
@@ -922,9 +920,16 @@ export default function HarryPotterQuiz() {
         onLoad={handleFirebaseScriptLoad}
       />
 
-      <div className={`hp-quiz-viewport ${viewportTheme}`}>
-        
-        {/* Overlay d'effet d'éclair magique */}
+      {!mounted ? (
+        <div style={{ background: '#05020a', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ color: '#ea80fc', fontFamily: "'Cinzel', serif", fontSize: '1.2rem', letterSpacing: '2px', textAlign: 'center' }}>
+            CHARGEMENT DU DUEL...
+          </div>
+        </div>
+      ) : (
+        <div className={`hp-quiz-viewport ${viewportTheme}`}>
+          
+          {/* Overlay d'effet d'éclair magique */}
         <div id="spell-flash-overlay" className={`spell-flash-overlay ${spellFlashClass}`} />
 
         <div className="stars-container">
@@ -1006,7 +1011,7 @@ export default function HarryPotterQuiz() {
                   <div className={`house-card gryffindor ${playerHouse === 'gryffindor' ? 'selected' : ''}`} onClick={() => setPlayerHouse('gryffindor')}>
                     <div className="house-bg-effect"></div>
                     <div className="house-crest-container">
-                      <svg viewBox="0 0 100 100" className="house-icon-svg" style={{ color: '#ae0001' }}>
+                      <svg viewBox="0 0 100 100" className="house-icon-svg">
                         <polygon points="50,10 85,25 85,75 50,90 15,75 15,25" fill="none" stroke="currentColor" stroke-width="3"/>
                         <path d="M35,32 Q50,20 65,32 Q70,50 50,78 Q30,50 35,32 Z" fill="rgba(116,0,1,0.2)" stroke="currentColor" stroke-width="1.5"/>
                         <text x="50" y="58" fontFamily="'Cinzel'" fontSize="28" fontWeight="bold" textAnchor="middle" fill="currentColor">G</text>
@@ -1019,7 +1024,7 @@ export default function HarryPotterQuiz() {
                   <div className={`house-card slytherin ${playerHouse === 'slytherin' ? 'selected' : ''}`} onClick={() => setPlayerHouse('slytherin')}>
                     <div className="house-bg-effect"></div>
                     <div className="house-crest-container">
-                      <svg viewBox="0 0 100 100" className="house-icon-svg" style={{ color: '#2a623d' }}>
+                      <svg viewBox="0 0 100 100" className="house-icon-svg">
                         <polygon points="50,10 85,25 85,75 50,90 15,75 15,25" fill="none" stroke="currentColor" stroke-width="3"/>
                         <path d="M35,32 Q50,20 65,32 Q70,50 50,78 Q30,50 35,32 Z" fill="rgba(26,71,42,0.2)" stroke="currentColor" stroke-width="1.5"/>
                         <text x="50" y="58" fontFamily="'Cinzel'" fontSize="28" fontWeight="bold" textAnchor="middle" fill="currentColor">S</text>
@@ -1032,7 +1037,7 @@ export default function HarryPotterQuiz() {
                   <div className={`house-card ravenclaw ${playerHouse === 'ravenclaw' ? 'selected' : ''}`} onClick={() => setPlayerHouse('ravenclaw')}>
                     <div className="house-bg-effect"></div>
                     <div className="house-crest-container">
-                      <svg viewBox="0 0 100 100" className="house-icon-svg" style={{ color: '#222f5b' }}>
+                      <svg viewBox="0 0 100 100" className="house-icon-svg">
                         <polygon points="50,10 85,25 85,75 50,90 15,75 15,25" fill="none" stroke="currentColor" stroke-width="3"/>
                         <path d="M35,32 Q50,20 65,32 Q70,50 50,78 Q30,50 35,32 Z" fill="rgba(14,26,64,0.2)" stroke="currentColor" stroke-width="1.5"/>
                         <text x="50" y="58" fontFamily="'Cinzel'" fontSize="28" fontWeight="bold" textAnchor="middle" fill="currentColor">R</text>
@@ -1045,7 +1050,7 @@ export default function HarryPotterQuiz() {
                   <div className={`house-card hufflepuff ${playerHouse === 'hufflepuff' ? 'selected' : ''}`} onClick={() => setPlayerHouse('hufflepuff')}>
                     <div className="house-bg-effect"></div>
                     <div className="house-crest-container">
-                      <svg viewBox="0 0 100 100" className="house-icon-svg" style={{ color: '#ecb939' }}>
+                      <svg viewBox="0 0 100 100" className="house-icon-svg">
                         <polygon points="50,10 85,25 85,75 50,90 15,75 15,25" fill="none" stroke="currentColor" stroke-width="3"/>
                         <path d="M35,32 Q50,20 65,32 Q70,50 50,78 Q30,50 35,32 Z" fill="rgba(236,185,57,0.25)" stroke="currentColor" stroke-width="1.5"/>
                         <text x="50" y="58" fontFamily="'Cinzel'" fontSize="28" fontWeight="bold" textAnchor="middle" fill="currentColor">P</text>
@@ -1521,6 +1526,7 @@ export default function HarryPotterQuiz() {
           )}
         </div>
       </div>
+      )}
     </>
   );
 }

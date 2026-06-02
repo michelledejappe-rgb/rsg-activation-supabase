@@ -100,6 +100,7 @@
     justify-content: space-between;
     position: relative;
     z-index: 1;
+    overflow: hidden; /* Empêche l'agrandissement et permet le scroll des enfants */
 }
 
 /* Étoiles en arrière-plan */
@@ -198,6 +199,7 @@
     transition: opacity 0.3s ease, transform 0.3s ease;
     width: 100%;
     height: 100%;
+    min-height: 0; /* Permet le rétrécissement sous Flexbox */
 }
 
 .screen.active {
@@ -279,25 +281,30 @@
 }
 
 .input-group label {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
+    font-weight: 600;
     text-transform: uppercase;
-    color: var(--color-text-muted);
+    color: var(--theme-accent, #ea80fc);
+    letter-spacing: 0.5px;
+    text-shadow: 0 0 10px rgba(234, 128, 252, 0.15);
 }
 
 .input-group input {
-    background: rgba(8, 3, 17, 0.7);
-    border: 1px solid var(--border-glass);
-    padding: 10px 12px;
+    background: rgba(20, 10, 40, 0.65);
+    border: 1px solid rgba(234, 128, 252, 0.25);
+    padding: 12px 14px;
     border-radius: 8px;
     color: #fff;
-    font-size: 1rem;
+    font-size: 1.05rem;
     font-family: 'Outfit', sans-serif;
     outline: none;
+    transition: all 0.3s ease;
 }
 
 .input-group input:focus {
     border-color: var(--theme-accent);
-    box-shadow: 0 0 8px var(--theme-accent-glow);
+    box-shadow: 0 0 12px var(--theme-accent);
+    background: rgba(30, 15, 60, 0.85);
 }
 
 /* Grille des maisons */
@@ -371,40 +378,64 @@
 }
 
 /* Sélection des maisons */
+.house-card.gryffindor {
+    color: #ff6b6b;
+    border: 1.5px solid rgba(174, 0, 1, 0.4);
+    background: rgba(116, 0, 1, 0.08);
+}
 .house-card.gryffindor:hover, .house-card.gryffindor.selected {
     color: #eeba30;
-    border-color: #ae0001;
-    box-shadow: 0 0 15px rgba(174, 0, 1, 0.3);
+    border: 2px solid #ae0001;
+    background: rgba(116, 0, 1, 0.25);
+    box-shadow: 0 0 20px rgba(174, 0, 1, 0.7);
 }
 .house-card.gryffindor .house-bg-effect {
-    background: radial-gradient(circle at center, rgba(116, 0, 1, 0.25) 0%, transparent 80%);
+    background: radial-gradient(circle at center, rgba(116, 0, 1, 0.35) 0%, transparent 80%);
 }
 
+.house-card.slytherin {
+    color: #51cf66;
+    border: 1.5px solid rgba(42, 98, 61, 0.45);
+    background: rgba(26, 71, 42, 0.08);
+}
 .house-card.slytherin:hover, .house-card.slytherin.selected {
     color: #2ecc71;
-    border-color: #2a623d;
-    box-shadow: 0 0 15px rgba(42, 98, 61, 0.3);
+    border: 2px solid #2a623d;
+    background: rgba(26, 71, 42, 0.25);
+    box-shadow: 0 0 20px rgba(42, 98, 61, 0.7);
 }
 .house-card.slytherin .house-bg-effect {
-    background: radial-gradient(circle at center, rgba(26, 71, 42, 0.25) 0%, transparent 80%);
+    background: radial-gradient(circle at center, rgba(26, 71, 42, 0.35) 0%, transparent 80%);
 }
 
+.house-card.ravenclaw {
+    color: #74c0fc;
+    border: 1.5px solid rgba(34, 47, 91, 0.5);
+    background: rgba(14, 26, 64, 0.12);
+}
 .house-card.ravenclaw:hover, .house-card.ravenclaw.selected {
     color: #00d2ff;
-    border-color: #222f5b;
-    box-shadow: 0 0 15px rgba(34, 47, 91, 0.3);
+    border: 2px solid #00d2ff;
+    background: rgba(14, 26, 64, 0.3);
+    box-shadow: 0 0 20px rgba(0, 210, 255, 0.7);
 }
 .house-card.ravenclaw .house-bg-effect {
-    background: radial-gradient(circle at center, rgba(14, 26, 64, 0.3) 0%, transparent 80%);
+    background: radial-gradient(circle at center, rgba(14, 26, 64, 0.4) 0%, transparent 80%);
 }
 
+.house-card.hufflepuff {
+    color: #ffd43b;
+    border: 1.5px solid rgba(236, 185, 57, 0.4);
+    background: rgba(236, 185, 57, 0.08);
+}
 .house-card.hufflepuff:hover, .house-card.hufflepuff.selected {
-    color: #ecb939;
-    border-color: #ecb939;
-    box-shadow: 0 0 15px rgba(236, 185, 57, 0.3);
+    color: #ffeb3b;
+    border: 2px solid #ecb939;
+    background: rgba(236, 185, 57, 0.2);
+    box-shadow: 0 0 20px rgba(236, 185, 57, 0.6);
 }
 .house-card.hufflepuff .house-bg-effect {
-    background: radial-gradient(circle at center, rgba(236, 185, 57, 0.15) 0%, transparent 80%);
+    background: radial-gradient(circle at center, rgba(236, 185, 57, 0.25) 0%, transparent 80%);
 }
 
 .house-card:hover .house-bg-effect, .house-card.selected .house-bg-effect {
