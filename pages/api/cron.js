@@ -44,6 +44,59 @@ function shouldKeepArticle(title, text) {
     }
   }
 
+  // 3. Anti-French Series Filter
+  const frenchSeriesTerms = [
+    'série française', 'séries françaises', 'série de tf1', 'série tf1', 
+    'série france 2', 'série france 3', 'série de france 2', 'série de france 3', 
+    'série de m6', 'série m6', 'série canal+', 'série canal +', 'série d\'arte', 'série arte',
+    'série de canal+', 'série de canal +', 'série d\'ocs', 'série ocs'
+  ];
+  for (const term of frenchSeriesTerms) {
+    if (t.includes(term) || d.includes(term)) {
+      return false;
+    }
+  }
+
+  // Combined checks: the word "série" or "saison" or "épisode" or "feuilleton" AND a French channel/series keyword
+  const containsSerieIndicator = t.includes('série') || t.includes('saison') || t.includes('épisode') || t.includes('feuilleton') ||
+                                 d.includes('série') || d.includes('saison') || d.includes('épisode') || d.includes('feuilleton');
+  
+  if (containsSerieIndicator) {
+    // Famous French series titles
+    const famousFrenchSeries = [
+      'hpi', 'lupin', 'dix pour cent', 'le bureau des légendes', 'bureau des legendes', 'kaamelott', 
+      'plus belle la vie', 'demain nous appartient', 'ici tout commence', 'un si grand soleil', 'clem', 
+      'balthazar', 'candice renoir', 'capitaine marleau', 'astrid et raphaëlle', 'astrid et raphaelle', 
+      'engrenages', 'les combattantes', 'le bazar de la charité', 'bazar de la charite', 'validé', 'valide', 
+      'family business', 'tapie', 'pax massilia', 'fiasco', 'ourika', 'la fièvre', 'la fievre', 'coeurs noirs', 
+      'baron noir', 'kaboul kitchen', 'l\'opéra', 'l\'opera', 'hippocrate', 'l\'art du crime', 'skam france', 
+      'le flambeau', 'la flamme', 'sous le soleil', 'caméra café', 'camera cafe', 'un gars une fille', 
+      'scènes de ménages', 'scenes de menages', 'vestiaires', 'nos chers voisins', 'le bureau', 'les revenants',
+      'mafiosa', 'braquo', 'guyane', 'le bureau des legendes', 'lupin'
+    ];
+    for (const show of famousFrenchSeries) {
+      const regex = new RegExp(`\\b${show}\\b`, 'i');
+      if (regex.test(title) || regex.test(text)) {
+        return false;
+      }
+    }
+
+    // Combined with French nationality indicator
+    if (t.includes('français') || t.includes('française') || t.includes('françaises') ||
+        d.includes('français') || d.includes('française') || d.includes('françaises')) {
+      return false;
+    }
+
+    // Combined with French TV channels
+    const frenchChannels = ['tf1', 'france 2', 'france 3', 'france3', 'france 5', 'france5', 'm6', 'canal+', 'canal +', 'arte', 'ocs'];
+    for (const channel of frenchChannels) {
+      const regex = new RegExp(`\\b${channel.replace('+', '\\+')}\\b`, 'i');
+      if (regex.test(title) || regex.test(text)) {
+        return false;
+      }
+    }
+  }
+
   return true;
 }
 
