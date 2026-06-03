@@ -599,11 +599,44 @@ export default function HarryPotterQuiz() {
     const questionsList = QUESTIONS_DB[oppId];
     if (!questionsList) return;
 
-    // Si on arrive au bout des questions de l'adversaire, on reboucle
-    const realIndex = qIdx >= questionsList.length ? 0 : qIdx;
-    const q = questionsList[realIndex];
+    // Récupérer l'historique des questions déjà répondues pour ce joueur
+    const storageKey = `hp_answered_${playerName.trim().toLowerCase()}`;
+    let answeredList = [];
+    try {
+      answeredList = JSON.parse(localStorage.getItem(storageKey)) || [];
+    } catch (e) {
+      console.log("Erreur lecture localStorage :", e);
+    }
+
+    // Filtrer les questions non répondues pour cet adversaire
+    let availableQuestions = questionsList.filter(q => !answeredList.includes(q.text));
+
+    // Si toutes les questions ont été posées, on réinitialise l'historique pour cet adversaire
+    if (availableQuestions.length === 0) {
+      const opponentQuestionTexts = questionsList.map(q => q.text);
+      answeredList = answeredList.filter(text => !opponentQuestionTexts.includes(text));
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(answeredList));
+      } catch (e) {
+        console.log("Erreur écriture localStorage :", e);
+      }
+      availableQuestions = [...questionsList];
+    }
+
+    // Choisir une question au hasard parmi celles disponibles
+    const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+    const q = availableQuestions[randomIndex];
+
+    // Mettre à jour l'historique avec cette nouvelle question
+    answeredList.push(q.text);
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(answeredList));
+    } catch (e) {
+      console.log("Erreur écriture localStorage :", e);
+    }
+
     setCurrentQuestion(q);
-    setQuestionIndex(realIndex);
+    setQuestionIndex(qIdx % questionsList.length);
 
     // Mélanger les options tout en gardant l'index original
     const optionsWithIndices = q.options.map((opt, i) => ({ text: opt, originalIndex: i }));
