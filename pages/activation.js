@@ -506,6 +506,7 @@ export default function HarryPotterQuiz() {
 
   const timerIntervalRef = useRef(null);
   const audioContextRef = useRef(null);
+  const canAnswerRef = useRef(false);
 
   useEffect(() => {
     setMounted(true);
@@ -577,6 +578,7 @@ export default function HarryPotterQuiz() {
     setViewportTheme(`${playerHouse}-theme`);
     
     setScreen('arena');
+    canAnswerRef.current = false;
     initDuel(1);
   };
 
@@ -643,6 +645,7 @@ export default function HarryPotterQuiz() {
     optionsWithIndices.sort(() => Math.random() - 0.5);
     setOptions(optionsWithIndices);
 
+    canAnswerRef.current = true;
     setCanAnswer(true);
     setTimeRemaining(15);
 
@@ -662,6 +665,8 @@ export default function HarryPotterQuiz() {
 
   // Quand le temps imparti est écoulé
   const handleTimeout = () => {
+    if (!canAnswerRef.current) return;
+    canAnswerRef.current = false;
     setCanAnswer(false);
     setQuestionsAnswered(prev => prev + 1);
     setStreak(0);
@@ -672,7 +677,8 @@ export default function HarryPotterQuiz() {
     const opponentSpell = opp.spells[spellIndex];
     const damage = 15 + (opponentId * 5);
 
-    setPlayerHP(prev => Math.max(0, prev - damage));
+    const nextPlHP = Math.max(0, playerHP - damage);
+    setPlayerHP(nextPlHP);
     setConsoleText(`Le temps est écoulé ! ${opp.name} en profite pour lancer ${opponentSpell} et vous inflige ${damage} dégâts !`);
 
     // Animation flash et secousse
@@ -686,21 +692,18 @@ export default function HarryPotterQuiz() {
       setSpellBeamClass("");
       setShakePlayer(false);
       
-      // Passage à l'état suivant après le timeout
-      setPlayerHP(currentHP => {
-        if (currentHP <= 0) {
-          setTimeout(() => endGame(false), 1500);
-        } else {
-          loadQuestion(opponentId, questionIndex + 1);
-        }
-        return currentHP;
-      });
+      if (nextPlHP <= 0) {
+        setTimeout(() => endGame(false), 1500);
+      } else {
+        loadQuestion(opponentId, questionIndex + 1);
+      }
     }, 2500);
   };
 
   // Soumettre une réponse
   const submitAnswer = (selectedBtnIndex) => {
-    if (!canAnswer) return;
+    if (!canAnswerRef.current) return;
+    canAnswerRef.current = false;
     setCanAnswer(false);
     if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
 
@@ -708,10 +711,13 @@ export default function HarryPotterQuiz() {
     const clickedOption = options[selectedBtnIndex];
     const isCorrect = clickedOption.originalIndex === currentQuestion.correct;
 
+    let nextPlHP = playerHP;
+    let nextOppHP = opponentHP;
+
     if (isCorrect) {
-      handleCorrectAnswer();
+      nextOppHP = handleCorrectAnswer();
     } else {
-      handleIncorrectAnswer();
+      nextPlHP = handleIncorrectAnswer();
     }
 
     setTimeout(() => {
@@ -720,20 +726,13 @@ export default function HarryPotterQuiz() {
       setShakePlayer(false);
       setShakeOpponent(false);
 
-      // On vérifie les PVs des joueurs après application des dégâts
-      setOpponentHP(oppHP => {
-        setPlayerHP(plHP => {
-          if (plHP <= 0) {
-            endGame(false);
-          } else if (oppHP <= 0) {
-            handleOpponentDefeated();
-          } else {
-            loadQuestion(opponentId, questionIndex + 1);
-          }
-          return plHP;
-        });
-        return oppHP;
-      });
+      if (nextPlHP <= 0) {
+        endGame(false);
+      } else if (nextOppHP <= 0) {
+        handleOpponentDefeated();
+      } else {
+        loadQuestion(opponentId, questionIndex + 1);
+      }
     }, 2500);
   };
 
@@ -759,7 +758,8 @@ export default function HarryPotterQuiz() {
       finalDamage = Math.round(finalDamage * 1.8);
     }
 
-    setOpponentHP(prev => Math.max(0, prev - finalDamage));
+    const nextOppHP = Math.max(0, opponentHP - finalDamage);
+    setOpponentHP(nextOppHP);
 
     const pointsGained = Math.round(100 * mult * (timeRemaining + 1));
     setScore(prev => prev + pointsGained);
@@ -776,6 +776,8 @@ export default function HarryPotterQuiz() {
     setSpellBeamColor(isPatronus ? "#00e5ff" : "var(--theme-accent)");
     setSpellBeamClass("correct-cast");
     setShakeOpponent(true);
+
+    return nextOppHP;
   };
 
   const handleIncorrectAnswer = () => {
@@ -787,13 +789,16 @@ export default function HarryPotterQuiz() {
     const opponentSpell = opp.spells[spellIndex];
     const damage = 15 + (opponentId * 5);
 
-    setPlayerHP(prev => Math.max(0, prev - damage));
+    const nextPlHP = Math.max(0, playerHP - damage);
+    setPlayerHP(nextPlHP);
     setConsoleText(`❌ Erreur ! ${opp.name} contre-attaque avec ${opponentSpell} et vous inflige ${damage} dégâts !`);
 
     setSpellFlashClass("active-wrong");
     setSpellBeamColor("#ff1744");
     setSpellBeamClass("wrong-cast");
     setShakePlayer(true);
+
+    return nextPlHP;
   };
 
   // Victoire sur un adversaire

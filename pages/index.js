@@ -440,6 +440,9 @@ export default function Home() {
               </div>
             )}
             
+            <a className="play-quiz-btn" href="https://meet.roadsixtygeek.com" target="_blank" rel="noopener noreferrer">
+              🎤 Meet-Up
+            </a>
             <button className="play-quiz-btn" onClick={() => window.location.href = '/activation'}>
               🎮 Jouer au Challenge
             </button>
